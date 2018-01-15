@@ -5,4 +5,5 @@
     <color name="colorAccent">#ff4081</color>
     <color name="CPBLBlue">#081b2f</color>
     <color name="white">#ffffff</color>
+    <color name="darkerCPBLBlue">#040D17</color>
 </resources>

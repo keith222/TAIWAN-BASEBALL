@@ -66,26 +66,26 @@ public class MainActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(mViewPager);
-        tabLayout.getTabAt(0).setIcon(iconResId[0]);
-        for(int i = 1; i < tabLayout.getTabCount(); i++) {
-            tabLayout.getTabAt(i).setIcon(iconResId[i]);
-        }
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                tab.setIcon(selectedIconresId[tab.getPosition()]);
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-               tab.setIcon(iconResId[tab.getPosition()]);
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {}
-        });
+//        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+//        tabLayout.setupWithViewPager(mViewPager);
+//        tabLayout.getTabAt(0).setIcon(iconResId[0]);
+//        for(int i = 1; i < tabLayout.getTabCount(); i++) {
+//            tabLayout.getTabAt(i).setIcon(iconResId[i]);
+//        }
+//        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+//            @Override
+//            public void onTabSelected(TabLayout.Tab tab) {
+//                tab.setIcon(selectedIconresId[tab.getPosition()]);
+//            }
+//
+//            @Override
+//            public void onTabUnselected(TabLayout.Tab tab) {
+//               tab.setIcon(iconResId[tab.getPosition()]);
+//            }
+//
+//            @Override
+//            public void onTabReselected(TabLayout.Tab tab) {}
+//        });
 
     }
 
