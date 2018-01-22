@@ -6,6 +6,15 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.*;
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 
 /**
@@ -23,9 +32,11 @@ public class NewsFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private OkHttpClient client = new OkHttpClient();
 
     public NewsFragment() {
         // Required empty public constructor
+
     }
 
     /**
@@ -45,17 +56,39 @@ public class NewsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_news, container, false);
+        final TextView textView = (TextView) view.findViewById(R.id.textView);
+
+        Request request = new Request.Builder().url("http://www.cpbl.com.tw/news/lists.html").build();
+
+        Call mcall = client.newCall(request);
+        mcall.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                final String resStr = response.body().string();
+
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        textView.setText(resStr);
+                    }
+                });
+            }
+        });
+
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_news, container, false);
+        return view;
     }
 
 }
