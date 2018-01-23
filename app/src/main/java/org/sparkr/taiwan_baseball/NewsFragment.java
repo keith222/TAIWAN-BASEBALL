@@ -3,12 +3,22 @@ package org.sparkr.taiwan_baseball;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.*;
 import java.io.IOException;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jsoup.*;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import org.sparkr.taiwan_baseball.Model.News;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -23,16 +33,10 @@ import okhttp3.Response;
  * create an instance of this fragment.
  */
 public class NewsFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private OkHttpClient client = new OkHttpClient();
+    private List newsList;
+    private RecyclerView recyclerView;
 
     public NewsFragment() {
         // Required empty public constructor
@@ -65,8 +69,9 @@ public class NewsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_news, container, false);
         final TextView textView = (TextView) view.findViewById(R.id.textView);
 
-        Request request = new Request.Builder().url("http://www.cpbl.com.tw/news/lists.html").build();
+        newsList = new ArrayList<>();
 
+        Request request = new Request.Builder().url("http://www.cpbl.com.tw/news/lists.html").build();
         Call mcall = client.newCall(request);
         mcall.enqueue(new Callback() {
             @Override
@@ -77,13 +82,45 @@ public class NewsFragment extends Fragment {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 final String resStr = response.body().string();
+                News news;
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        textView.setText(resStr);
+                try {
+                    Document doc = Jsoup.parse(resStr);
+
+                    String topNewsTitle = doc.select(".news_head_title > a").text();
+                    String topNewsDate = doc.select(".news_head_date").text();
+                    String topNewsUrl = doc.select(".games_news_pic > a").attr("href").toString();
+                    String topNewsImageUrl = doc.select(".games_news_pic > a > img").attr("src").toString();
+
+                    if(!topNewsTitle.isEmpty()) {
+                        news = new News(topNewsTitle, topNewsDate, topNewsImageUrl, topNewsUrl);
+                        newsList.add(news);
                     }
-                });
+
+                    Elements nodes = doc.select(".news_row");
+                    for(Element node: nodes) {
+                        String newstitle = node.select(".news_row_cont > div > a.news_row_title").text().trim();
+                        String tmpeDate = node.select(".news_row_date").text().trim();
+                        String newsDate = tmpeDate;
+                        String newsImageUrl = node.select(".news_row_pic > img").attr("src").toString();
+                        String newsUrl = node.select(".news_row_cont > div > a").attr("href").toString();
+
+                        news = new News(newstitle, newsDate, newsImageUrl, newsUrl);
+                        newsList.add(news);
+                    }
+                } catch (Exception e) {
+                    Log.d("error:", e.toString());
+                }
+
+
+
+
+//                getActivity().runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        textView.setText(resStr);
+//                    }
+//                });
             }
         });
 
