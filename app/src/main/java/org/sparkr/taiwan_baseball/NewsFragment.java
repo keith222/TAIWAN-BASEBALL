@@ -45,6 +45,7 @@ public class NewsFragment extends Fragment {
 
     private OkHttpClient client = new OkHttpClient();
     private List newsList;
+    private NewsAdapter adapter;
     private RecyclerView recyclerView;
     private int page = 0;
 
@@ -77,10 +78,15 @@ public class NewsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_news, container, false);
 
-        final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.newsRecyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         newsList = new ArrayList<>();
-        this.fetchNews(this.page);
+
+        final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.newsRecyclerView);
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(layoutManager);
+        adapter = new NewsAdapter(newsList);
+        recyclerView.setAdapter(adapter);
+        fetchNews(page);
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -124,6 +130,8 @@ public class NewsFragment extends Fragment {
 
                     Elements nodes = doc.select(".news_row");
                     for(Element node: nodes) {
+                        if (node.select(".news_row_date").text().isEmpty()) {continue;}
+
                         String newstitle = node.select(".news_row_cont > div > a.news_row_title").text().trim();
                         String tmpeDate = node.select(".news_row_date").text().trim();
                         String newsDate = tmpeDate;
@@ -137,13 +145,13 @@ public class NewsFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            NewsAdapter adapter = new NewsAdapter(newsList);
-                            recyclerView.setAdapter(adapter);
+                            adapter.notifyDataSetChanged();
+
                             adapter.setOnClick(new NewsAdapter.OnItemClicked(){
                                 @Override
                                 public void onItemClick(int position) {
                                     News selectedNews = (News) newsList.get(position);
-                                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(selectedNews.getNewsUrl()));
+                                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getActivity().getString(R.string.CPBLSourceURL) + selectedNews.getNewsUrl()));
                                     startActivity(intent);
                                 }
                             });
@@ -205,7 +213,7 @@ public class NewsFragment extends Fragment {
             holder.titleTextView.setText(newsData.getTitle());
             holder.dateTextView.setText(newsData.getDate());
             holder.newsURL = newsData.getNewsUrl();
-            Glide.with(holder.newsImageView.getContext()).load(newsData.getImageUrl()).fitCenter().into(holder.newsImageView);
+            Glide.with(holder.newsImageView.getContext()).load(newsData.getImageUrl()).centerCrop().into(holder.newsImageView);
 
             holder.itemView.setOnClickListener(new View.OnClickListener(){
                 @Override
