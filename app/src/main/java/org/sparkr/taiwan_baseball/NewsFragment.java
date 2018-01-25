@@ -1,14 +1,23 @@
 package org.sparkr.taiwan_baseball;
 
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
+
 import java.io.IOException;
 
 import java.util.ArrayList;
@@ -37,6 +46,7 @@ public class NewsFragment extends Fragment {
     private OkHttpClient client = new OkHttpClient();
     private List newsList;
     private RecyclerView recyclerView;
+    private int page = 0;
 
     public NewsFragment() {
         // Required empty public constructor
@@ -49,7 +59,6 @@ public class NewsFragment extends Fragment {
      *
      * @return A new instance of fragment NewsFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static NewsFragment newInstance() {
         NewsFragment fragment = new NewsFragment();
         Bundle args = new Bundle();
@@ -67,11 +76,27 @@ public class NewsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_news, container, false);
-        final TextView textView = (TextView) view.findViewById(R.id.textView);
 
+        final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.newsRecyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         newsList = new ArrayList<>();
+        this.fetchNews(this.page);
 
-        Request request = new Request.Builder().url("http://www.cpbl.com.tw/news/lists.html").build();
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                Log.d("dy", ""+dy);
+            }
+        });
+
+        // Inflate the layout for this fragment
+        return view;
+    }
+
+    private void fetchNews(final int newPage) {
+        Request request = new Request.Builder().url(this.getString(R.string.CPBLSourceURL) + "news/lists/news_lits.html?per_page=" + newPage).build();
         Call mcall = client.newCall(request);
         mcall.enqueue(new Callback() {
             @Override
@@ -108,24 +133,96 @@ public class NewsFragment extends Fragment {
                         news = new News(newstitle, newsDate, newsImageUrl, newsUrl);
                         newsList.add(news);
                     }
+
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            NewsAdapter adapter = new NewsAdapter(newsList);
+                            recyclerView.setAdapter(adapter);
+                            adapter.setOnClick(new NewsAdapter.OnItemClicked(){
+                                @Override
+                                public void onItemClick(int position) {
+                                    News selectedNews = (News) newsList.get(position);
+                                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(selectedNews.getNewsUrl()));
+                                    startActivity(intent);
+                                }
+                            });
+                        }
+                    });
+
+                    page += 1;
+
                 } catch (Exception e) {
                     Log.d("error:", e.toString());
                 }
-
-
-
-
-//                getActivity().runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        textView.setText(resStr);
-//                    }
-//                });
             }
         });
+    }
 
-        // Inflate the layout for this fragment
-        return view;
+    public static class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
+
+        private List<News> news;
+        private OnItemClicked onClick;
+
+        public interface OnItemClicked {
+            void onItemClick(int position);
+        }
+
+        public NewsAdapter(List<News> news) {
+            this.news = news;
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder {
+
+            private final TextView titleTextView;
+            private final TextView dateTextView;
+            private final ImageView newsImageView;
+            private String newsURL;
+
+            public ViewHolder(View itemView) {
+                super(itemView);
+
+                titleTextView = (TextView) itemView.findViewById(R.id.titleTextView);
+                dateTextView = (TextView) itemView.findViewById(R.id.dateTextView);
+                newsImageView = (ImageView) itemView.findViewById(R.id.newsImageView);
+            }
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            Context context = parent.getContext();
+            View view = LayoutInflater.from(context).inflate(R.layout.news_list, parent, false);
+            ViewHolder viewHolder = new ViewHolder(view);
+
+            return viewHolder;
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder holder, final int position) {
+            Log.d("News", position+"");
+
+            News newsData = news.get(position);
+            holder.titleTextView.setText(newsData.getTitle());
+            holder.dateTextView.setText(newsData.getDate());
+            holder.newsURL = newsData.getNewsUrl();
+            Glide.with(holder.newsImageView.getContext()).load(newsData.getImageUrl()).fitCenter().into(holder.newsImageView);
+
+            holder.itemView.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    onClick.onItemClick(position);
+                }
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return news.size();
+        }
+
+        public void setOnClick(OnItemClicked onClick) {
+            this.onClick = onClick;
+        }
     }
 
 }

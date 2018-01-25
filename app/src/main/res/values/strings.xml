@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">TAIWAN BASEBALL</string>
     <string name="action_settings">Settings</string>
+    <string name="CPBLSourceURL">http://www.cpbl.com.tw/</string>
 </resources>

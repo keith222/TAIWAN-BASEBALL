@@ -16,4 +16,20 @@ public class News {
         this.imageUrl = imageurl;
         this.newsUrl = newsUrl;
     }
+
+    public String getTitle(){
+        return this.title;
+    }
+
+    public String getDate(){
+        return  this.date;
+    }
+
+    public String getImageUrl(){
+        return this.imageUrl;
+    }
+
+    public  String getNewsUrl(){
+        return this.newsUrl;
+    }
 }
