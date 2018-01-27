@@ -14,16 +14,15 @@
         android:layout_height="111dp"
         android:background="@color/CPBLBlue"
         android:paddingTop="@dimen/appbar_padding_top"
-        android:theme="@style/AppTheme.AppBarOverlay"
         tools:layout_editor_absoluteY="1dp">
 
         <android.support.v7.widget.Toolbar
+            app:titleTextColor="@color/white"
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/CPBLBlue"
-            app:layout_scrollFlags="scroll|enterAlways"
-            app:popupTheme="@style/AppTheme.PopupOverlay">
+            app:layout_scrollFlags="scroll|enterAlways">
 
         </android.support.v7.widget.Toolbar>
 
@@ -73,6 +72,18 @@
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    </android.support.v4.view.ViewPager>
+
+    <RelativeLayout
+        android:id="@+id/loadingPanel"
+        style="@style/GenericProgressBackground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ProgressBar style="@style/GenericProgressIndicator" />
+
+    </RelativeLayout>
 
 </android.support.design.widget.CoordinatorLayout>

@@ -1,6 +1,7 @@
 package org.sparkr.taiwan_baseball;
 
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -14,7 +15,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
@@ -48,6 +51,10 @@ public class NewsFragment extends Fragment {
     private NewsAdapter adapter;
     private RecyclerView recyclerView;
     private int page = 0;
+    private int previousTotal = 0;
+    private int visibleThreshold = 4;
+    private Boolean loading = true;
+    int firstVisibleItem, visibleItemCount, totalItemCount;
 
     public NewsFragment() {
         // Required empty public constructor
@@ -71,6 +78,12 @@ public class NewsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        getActivity().findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+
+        newsList = new ArrayList<>();
+        adapter = new NewsAdapter(newsList);
+        fetchNews(page);
+
     }
 
     @Override
@@ -78,22 +91,35 @@ public class NewsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_news, container, false);
 
-        newsList = new ArrayList<>();
-
         final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.newsRecyclerView);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new NewsAdapter(newsList);
         recyclerView.setAdapter(adapter);
-        fetchNews(page);
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
 
-                Log.d("dy", ""+dy);
+                visibleItemCount = recyclerView.getChildCount();
+                totalItemCount = layoutManager.getItemCount();
+                firstVisibleItem = layoutManager.findFirstVisibleItemPosition();
+
+                if(loading) {
+                    if(totalItemCount > previousTotal) {
+                        loading = false;
+                        previousTotal = totalItemCount;
+                    }
+                }
+
+                if (!loading && ((totalItemCount - visibleItemCount) <= (firstVisibleItem + visibleThreshold))) {
+                    page++;
+                    fetchNews(page);
+
+                    loading = true;
+                }
+
             }
         });
 
@@ -107,7 +133,12 @@ public class NewsFragment extends Fragment {
         mcall.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-
+                getActivity().runOnUiThread(new Runnable() {//这是Activity的方法，会在主线程执行任务
+                    @Override
+                    public void run() {
+                        Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
+                    }
+                });
             }
 
             @Override
@@ -142,23 +173,27 @@ public class NewsFragment extends Fragment {
                         newsList.add(news);
                     }
 
+                    adapter.setOnClick(new NewsAdapter.OnItemClicked(){
+                        @Override
+                        public void onItemClick(int position) {
+                            News selectedNews = (News) newsList.get(position);
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getActivity().getString(R.string.CPBLSourceURL) + selectedNews.getNewsUrl()));
+                            startActivity(intent);
+                        }
+                    });
+
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             adapter.notifyDataSetChanged();
 
-                            adapter.setOnClick(new NewsAdapter.OnItemClicked(){
-                                @Override
-                                public void onItemClick(int position) {
-                                    News selectedNews = (News) newsList.get(position);
-                                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getActivity().getString(R.string.CPBLSourceURL) + selectedNews.getNewsUrl()));
-                                    startActivity(intent);
-                                }
-                            });
+                            if(getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE) {
+                                getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                            }
+
                         }
                     });
 
-                    page += 1;
 
                 } catch (Exception e) {
                     Log.d("error:", e.toString());
@@ -207,15 +242,13 @@ public class NewsFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, final int position) {
-            Log.d("News", position+"");
-
             News newsData = news.get(position);
             holder.titleTextView.setText(newsData.getTitle());
             holder.dateTextView.setText(newsData.getDate());
             holder.newsURL = newsData.getNewsUrl();
             Glide.with(holder.newsImageView.getContext()).load(newsData.getImageUrl()).centerCrop().into(holder.newsImageView);
 
-            holder.itemView.setOnClickListener(new View.OnClickListener(){
+            holder.newsImageView.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v) {
                     onClick.onItemClick(position);
