@@ -1,7 +1,5 @@
 package org.sparkr.taiwan_baseball;
 
-
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -15,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,7 +46,6 @@ public class NewsFragment extends Fragment {
     private OkHttpClient client = new OkHttpClient();
     private List newsList;
     private NewsAdapter adapter;
-    private RecyclerView recyclerView;
     private int page = 0;
     private int previousTotal = 0;
     private int visibleThreshold = 4;
@@ -217,16 +213,16 @@ public class NewsFragment extends Fragment {
 
         public class ViewHolder extends RecyclerView.ViewHolder {
 
-            private final TextView titleTextView;
-            private final TextView dateTextView;
+            private final TextView newsTitleTextView;
+            private final TextView newsDateTextView;
             private final ImageView newsImageView;
             private String newsURL;
 
             public ViewHolder(View itemView) {
                 super(itemView);
 
-                titleTextView = (TextView) itemView.findViewById(R.id.titleTextView);
-                dateTextView = (TextView) itemView.findViewById(R.id.dateTextView);
+                newsTitleTextView = (TextView) itemView.findViewById(R.id.newsTitleTextView);
+                newsDateTextView = (TextView) itemView.findViewById(R.id.newsDateTextView);
                 newsImageView = (ImageView) itemView.findViewById(R.id.newsImageView);
             }
         }
@@ -243,8 +239,8 @@ public class NewsFragment extends Fragment {
         @Override
         public void onBindViewHolder(ViewHolder holder, final int position) {
             News newsData = news.get(position);
-            holder.titleTextView.setText(newsData.getTitle());
-            holder.dateTextView.setText(newsData.getDate());
+            holder.newsTitleTextView.setText(newsData.getTitle());
+            holder.newsDateTextView.setText(newsData.getDate());
             holder.newsURL = newsData.getNewsUrl();
             Glide.with(holder.newsImageView.getContext()).load(newsData.getImageUrl()).centerCrop().into(holder.newsImageView);
 

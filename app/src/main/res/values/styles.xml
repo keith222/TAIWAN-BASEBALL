@@ -15,7 +15,7 @@
     <style name="GenericProgressBackground" parent="android:Theme">
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">fill_parent</item>
-        <item name="android:background">#DD111111</item>
+        <item name="android:background">#73111111</item>
         <item name="android:gravity">center</item>
     </style>
     <style name="GenericProgressIndicator" parent="@android:style/Widget.ProgressBar">

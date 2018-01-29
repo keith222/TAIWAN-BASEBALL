@@ -5,7 +5,7 @@
     android:layout_height="200dp">
 
     <ImageView
-        android:id="@+id/newsImageView"
+        android:id="@+id/videoImageView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="10dp"
@@ -19,7 +19,7 @@
         android:orientation="vertical" >
 
         <TextView
-            android:id="@+id/newsTitleTextView"
+            android:id="@+id/videoTitleTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="8dp"
@@ -29,7 +29,7 @@
             android:text="Title" />
 
         <TextView
-            android:id="@+id/newsDateTextView"
+            android:id="@+id/videoDateTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
