@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="70dp"
+    android:background="@color/CPBLBlue">
+
+    <TextView
+        android:id="@+id/rankSeasonTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10sp"
+        android:layout_marginTop="10sp"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:textStyle="normal"
+        android:text="全年度" />
+
+    <TextView
+        android:id="@+id/rankTeamTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rankSeasonTextView"
+        android:layout_marginTop="8sp"
+        android:layout_marginLeft="10sp"
+        android:textSize="17sp"
+        android:textColor="@color/white"
+        android:text="隊名" />
+
+    <TextView
+        android:id="@+id/rankWinTextView"
+        android:layout_width="28sp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/rankTeamTextView"
+        android:layout_toLeftOf="@+id/rankTieTextView"
+        android:layout_marginRight="15sp"
+        android:textSize="17sp"
+        android:textColor="@color/white"
+        android:textAlignment="center"
+        android:text="勝" />
+
+    <TextView
+        android:id="@+id/rankTieTextView"
+        android:layout_width="28sp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/rankTeamTextView"
+        android:layout_toLeftOf="@+id/rankLoseTextView"
+        android:layout_marginRight="15sp"
+        android:textSize="17sp"
+        android:textColor="@color/white"
+        android:text="和" />
+
+    <TextView
+        android:id="@+id/rankLoseTextView"
+        android:layout_width="28sp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/rankTeamTextView"
+        android:layout_marginRight="15sp"
+        android:layout_toLeftOf="@+id/rankRateTextView"
+        android:textSize="17sp"
+        android:textColor="@color/white"
+        android:textAlignment="center"
+        android:text="敗" />
+
+    <TextView
+        android:id="@+id/rankRateTextView"
+        android:layout_width="50sp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/rankTeamTextView"
+        android:layout_toLeftOf="@+id/rankGbTextView"
+        android:layout_marginRight="15sp"
+        android:textSize="17sp"
+        android:textColor="@color/white"
+        android:textAlignment="center"
+        android:text="勝率" />
+
+    <TextView
+        android:id="@+id/rankGbTextView"
+        android:layout_width="35sp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="15sp"
+        android:layout_alignBottom="@+id/rankTeamTextView"
+        android:layout_alignParentRight="true"
+        android:textColor="@color/white"
+        android:textSize="17sp"
+        android:textAlignment="center"
+        android:text="勝差" />
+</RelativeLayout>
