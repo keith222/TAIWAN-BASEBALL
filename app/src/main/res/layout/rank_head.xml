@@ -47,6 +47,7 @@
         android:layout_marginRight="15sp"
         android:textSize="17sp"
         android:textColor="@color/white"
+        android:textAlignment="center"
         android:text="和" />
 
     <TextView

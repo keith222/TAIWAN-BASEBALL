@@ -5,11 +5,11 @@
     android:layout_height="75dp" >
 
     <ImageView
-        android:id="@+id/rankTeamimageView"
+        android:id="@+id/rankTeamImageView"
         android:layout_width="55sp"
         android:layout_height="55sp"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="10sp"
+        android:layout_marginLeft="14sp"
         app:srcCompat="@color/white" />
 
     <TextView
@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@+id/tieTextView"
-        android:layout_marginRight="15sp"
+        android:layout_marginRight="14sp"
         android:textSize="17sp"
         android:textAlignment="center"
         android:textColor="#000"
@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@+id/loseTextView"
-        android:layout_marginRight="15sp"
+        android:layout_marginRight="14sp"
         android:textSize="17sp"
         android:textAlignment="center"
         android:textColor="#000"
@@ -42,7 +42,7 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@+id/rateTextView"
-        android:layout_marginRight="15sp"
+        android:layout_marginRight="14sp"
         android:textSize="17sp"
         android:textAlignment="center"
         android:textColor="#000"
@@ -54,7 +54,7 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@+id/gbTextView"
-        android:layout_marginRight="15sp"
+        android:layout_marginRight="14sp"
         android:textSize="17sp"
         android:textAlignment="center"
         android:textColor="#000"
