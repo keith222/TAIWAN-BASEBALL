@@ -1,7 +1,6 @@
 package org.sparkr.taiwan_baseball;
 
 import android.content.Context;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,13 +24,16 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.sparkr.taiwan_baseball.Model.Rank;
-import org.w3c.dom.Text;
 
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+
+import io.github.luizgrp.sectionedrecyclerviewadapter.SectionParameters;
+import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
+import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -42,7 +44,7 @@ public class RankFragment extends Fragment {
 
     private OkHttpClient client = new OkHttpClient();
     private List rankList;
-    private RankAdapter adapter;
+    private SectionedRecyclerViewAdapter adapter;
 
     public RankFragment() {
         // Required empty public constructor
@@ -69,7 +71,7 @@ public class RankFragment extends Fragment {
         getActivity().findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
 
         rankList = new ArrayList<>();
-        adapter = new RankAdapter(rankList);
+        adapter = new SectionedRecyclerViewAdapter();
 
         int year = Calendar.getInstance().get(Calendar.YEAR);
         int month = Calendar.getInstance().get(Calendar.MONTH);
@@ -97,7 +99,6 @@ public class RankFragment extends Fragment {
 
 
     public void fetchRank(final String year) {
-        Log.d("go","gogogogogo");
         Request request = new Request.Builder().url(this.getString(R.string.CPBLSourceURL) + "standing/year/"+ year +".html").build();
         Call mcall = client.newCall(request);
         mcall.enqueue(new Callback() {
@@ -139,7 +140,17 @@ public class RankFragment extends Fragment {
                             rank.add(new Rank(rankElement.get(0), winLose[0], winLose[1], winLose[2], rankElement.get(2), rankElement.get(3)));
                         }
 
-                        rankList.add(rank);
+                        //rankList.add(rank);
+                    }
+
+                    if(rank.size() >= 4) {
+                        adapter.addSection(new RankSection("上半季", rank.subList(0,4)));
+                    }
+                    if(rank.size() >= 8) {
+                        adapter.addSection(new RankSection("下半季", rank.subList(4,8)));
+                    }
+                    if(rank.size() >= 12) {
+                        adapter.addSection(new RankSection("全年度", rank.subList(8,12)));
                     }
 
                     getActivity().runOnUiThread(new Runnable() {
@@ -147,7 +158,7 @@ public class RankFragment extends Fragment {
                         public void run() {
                             adapter.notifyDataSetChanged();
 
-                            if(getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE) {
+                            if(getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE && getActivity().findViewById(R.id.rankRecyclerView).getVisibility() == View.VISIBLE) {
                                 getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
                             }
                         }
@@ -160,120 +171,50 @@ public class RankFragment extends Fragment {
         });
     }
 
-    public static class RankAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    public class RankSection extends StatelessSection {
+        private String title;
+        private List<Rank> rankList;
 
-        private List rank;
-
-        public RankAdapter(List rank) {
-            this.rank = rank;
-        }
-
-        public class HeadViewHolder extends RecyclerView.ViewHolder {
-
-            private final TextView seasonTextView;
-
-            public HeadViewHolder(View itemView) {
-                super(itemView);
-
-                seasonTextView = (TextView) itemView.findViewById(R.id.rankSeasonTextView);
-            }
-
-        }
-
-        public class RankViewHolder extends RecyclerView.ViewHolder {
-
-            private final ImageView teamImageView;
-            private final TextView winTextView;
-            private final TextView loseTextView;
-            private final TextView tieTextView;
-            private final TextView percentageTextView;
-            private final TextView gamebehindTextView;
-
-            public RankViewHolder(View itemView) {
-                super(itemView);
-
-                teamImageView = (ImageView) itemView.findViewById(R.id.rankTeamImageView);
-                winTextView = (TextView) itemView.findViewById(R.id.winTextView);
-                loseTextView = (TextView) itemView.findViewById(R.id.loseTextView);
-                tieTextView = (TextView) itemView.findViewById(R.id.tieTextView);
-                percentageTextView = (TextView) itemView.findViewById(R.id.rateTextView);
-                gamebehindTextView = (TextView) itemView.findViewById(R.id.gbTextView);
-            }
+        public RankSection(String title, List rankList) {
+            super(new SectionParameters.Builder(R.layout.rank_list).headerResourceId(R.layout.rank_head).build());
+            this.title = title;
+            this.rankList = rankList;
         }
 
         @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            Context context = parent.getContext();
-            View view;
-
-            if(viewType == 1) {
-                view = LayoutInflater.from(context).inflate(R.layout.rank_head, parent, false);
-                return new HeadViewHolder(view);
-
-            } else {
-                view = LayoutInflater.from(context).inflate(R.layout.rank_list, parent, false);
-                return new RankViewHolder(view);
-            }
+        public int getContentItemsTotal() {
+            return rankList.size();
         }
 
         @Override
-        public int getItemViewType(int position) {
-            if(position == 0 || position == 5 || position == 10) {
-                return 1;
-            } else {
-                return 0;
-            }
+        public RecyclerView.ViewHolder getItemViewHolder(View view) {
+            return new ItemViewHolder(view);
         }
 
         @Override
-        public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
-            if(rank.size() < 1) { return; }
+        public void onBindItemViewHolder(RecyclerView.ViewHolder holder, int position) {
+            final ItemViewHolder itemHolder = (ItemViewHolder) holder;
 
-            switch (position) {
-                case 0:
-                    ((HeadViewHolder)holder).seasonTextView.setText("上半季");
-                    break;
-                case 5:
-                    ((HeadViewHolder)holder).seasonTextView.setText((rank.size() == 8)?"全年度":"下半季");
-                    break;
-                case 10:
-                    ((HeadViewHolder)holder).seasonTextView.setText("全年度");
-                    break;
-            }
+            Rank rankData = rankList.get(position);
 
-            if(position != 0 && position != 5 && position != 10) {
-                int dataPosition = 0;
-                Rank rankData = null;
-
-                if(position > 0 && position < 5) {
-                    dataPosition = position - 1;
-                    rankData = ((List<Rank>)rank.get(0)).get(dataPosition);
-
-                } else if (position > 5 && position < 10) {
-                    dataPosition = position - 6;
-                    rankData = ((List<Rank>)rank.get(0)).get(dataPosition);
-                } else if (position > 10 && position < 15) {
-                    dataPosition = position - 11;
-                    rankData = ((List<Rank>)rank.get(0)).get(dataPosition);
-                }
-
-                ((RankViewHolder)holder).teamImageView.setImageResource(getTeamImage(rankData.getTeam()));
-                ((RankViewHolder)holder).winTextView.setText(rankData.getWin());
-                ((RankViewHolder)holder).loseTextView.setText(rankData.getLose());
-                ((RankViewHolder)holder).tieTextView.setText(rankData.getTie());
-                ((RankViewHolder)holder).percentageTextView.setText(rankData.getPercentage());
-                ((RankViewHolder)holder).gamebehindTextView.setText(rankData.getGamebehind());
-            }
+            itemHolder.teamImageView.setImageResource(getTeamImage(rankData.getTeam()));
+            itemHolder.winTextView.setText(rankData.getWin());
+            itemHolder.loseTextView.setText(rankData.getLose());
+            itemHolder.tieTextView.setText(rankData.getTie());
+            itemHolder.percentageTextView.setText(rankData.getPercentage());
+            itemHolder.gamebehindTextView.setText(rankData.getGamebehind());
         }
 
         @Override
-        public int getItemCount() {
-            switch (rank.size()) {
-                case 1: return 5;
-                case 2: return 10;
-                case 3: return 15;
-                default: return 0;
-            }
+        public RecyclerView.ViewHolder getHeaderViewHolder(View view) {
+            return new HeaderViewHolder(view);
+        }
+
+        @Override
+        public void onBindHeaderViewHolder(RecyclerView.ViewHolder holder) {
+            HeaderViewHolder headerHolder = (HeaderViewHolder) holder;
+
+            headerHolder.seasonTextView.setText(title);
         }
 
         public int getTeamImage(String team) {
@@ -288,4 +229,35 @@ public class RankFragment extends Fragment {
         }
     }
 
+    private class HeaderViewHolder extends RecyclerView.ViewHolder {
+
+        private final TextView seasonTextView;
+
+        HeaderViewHolder(View view) {
+            super(view);
+
+            seasonTextView = (TextView) view.findViewById(R.id.rankSeasonTextView);
+        }
+    }
+
+    private class ItemViewHolder extends RecyclerView.ViewHolder {
+
+        private final ImageView teamImageView;
+        private final TextView winTextView;
+        private final TextView loseTextView;
+        private final TextView tieTextView;
+        private final TextView percentageTextView;
+        private final TextView gamebehindTextView;
+
+        public ItemViewHolder(View itemView) {
+            super(itemView);
+
+            teamImageView = (ImageView) itemView.findViewById(R.id.rankTeamImageView);
+            winTextView = (TextView) itemView.findViewById(R.id.winTextView);
+            loseTextView = (TextView) itemView.findViewById(R.id.loseTextView);
+            tieTextView = (TextView) itemView.findViewById(R.id.tieTextView);
+            percentageTextView = (TextView) itemView.findViewById(R.id.rateTextView);
+            gamebehindTextView = (TextView) itemView.findViewById(R.id.gbTextView);
+        }
+    }
 }
