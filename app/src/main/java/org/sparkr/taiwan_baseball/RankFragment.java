@@ -1,6 +1,5 @@
 package org.sparkr.taiwan_baseball;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -43,7 +42,6 @@ import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection;
 public class RankFragment extends Fragment {
 
     private OkHttpClient client = new OkHttpClient();
-    private List rankList;
     private SectionedRecyclerViewAdapter adapter;
 
     public RankFragment() {
@@ -70,7 +68,6 @@ public class RankFragment extends Fragment {
 
         getActivity().findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
 
-        rankList = new ArrayList<>();
         adapter = new SectionedRecyclerViewAdapter();
 
         int year = Calendar.getInstance().get(Calendar.YEAR);
@@ -140,7 +137,6 @@ public class RankFragment extends Fragment {
                             rank.add(new Rank(rankElement.get(0), winLose[0], winLose[1], winLose[2], rankElement.get(2), rankElement.get(3)));
                         }
 
-                        //rankList.add(rank);
                     }
 
                     if(rank.size() >= 4) {

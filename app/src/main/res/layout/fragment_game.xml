@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_game"
+    android:background="@color/white"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:android="http://schemas.android.com/apk/res/android" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="100sp">
+
+                <TextView
+                    android:id="@+id/gameNumberTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="8sp"
+                    android:text="000"
+                    android:textAlignment="center"
+                    android:textColor="#18191B"
+                    android:textSize="14sp" />
+
+                <ImageView
+                    android:id="@+id/guestImageView"
+                    android:layout_width="50sp"
+                    android:layout_height="50sp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="15sp"
+                    app:srcCompat="@color/white" />
+
+                <TextView
+                    android:id="@+id/guestScoreTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="5sp"
+                    android:layout_toRightOf="@id/guestImageView"
+                    android:text="--"
+                    android:textAlignment="center"
+                    android:textColor="#000"
+                    android:textSize="35sp" />
+
+                <ImageButton
+                    android:id="@+id/streamImageView"
+                    android:layout_width="50sp"
+                    android:layout_height="50sp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:background="@null"
+                    android:scaleType="fitCenter"
+                    app:srcCompat="@mipmap/stream" />
+
+                <TextView
+                    android:id="@+id/placeTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="9sp"
+                    android:text="比賽場地"
+                    android:textAlignment="center"
+                    android:textColor="#555555"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/homeScoreTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="5sp"
+                    android:layout_toLeftOf="@id/homeImageView"
+                    android:text="--"
+                    android:textAlignment="center"
+                    android:textColor="#000"
+                    android:textSize="35sp" />
+
+                <ImageView
+                    android:id="@+id/homeImageView"
+                    android:layout_width="50sp"
+                    android:layout_height="50sp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="15sp"
+                    app:srcCompat="@color/white" />
+
+            </RelativeLayout>
+
+            <WebView
+                android:id="@+id/scoreWebView"
+                android:layout_width="match_parent"
+                android:layout_height="110sp"
+                android:layout_marginLeft="-10sp"
+                android:layout_marginRight="-10sp"
+                android:background="@color/white" >
+
+            </WebView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50sp"
+                android:orientation="vertical"
+                android:gravity="center"
+                tools:context="info.hoang8f.android.segmented.SampleActivity$PlaceholderFragment">
+
+                <info.hoang8f.android.segmented.SegmentedGroup
+                    xmlns:segmentedgroup="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/segmented"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:orientation="horizontal"
+                    segmentedgroup:sc_tint_color="@color/CPBLBlue"
+                    segmentedgroup:sc_checked_text_color="@color/white"
+                    segmentedgroup:sc_border_width="1sp"
+                    segmentedgroup:sc_corner_radius="5sp">
+
+                    <RadioButton
+                        android:id="@+id/boxButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Box"
+                        android:checked="true"
+                        android:layout_weight="1"
+                        style="@style/RadioButton" />
+
+                    <RadioButton
+                        android:id="@+id/playButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Play By Play"
+                        android:layout_weight="1"
+                        style="@style/RadioButton" />
+                </info.hoang8f.android.segmented.SegmentedGroup>
+
+            </LinearLayout>
+
+            <WebView
+                android:id="@+id/gameWebView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="-10sp"
+                android:layout_marginRight="-10sp"
+                android:layout_marginTop="-10sp"
+                android:background="@color/white" />
+
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
+
+</FrameLayout>

@@ -1,9 +1,6 @@
 package org.sparkr.taiwan_baseball;
 
 import android.support.design.widget.TabLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ListFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -12,12 +9,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
-import java.util.List;
+import com.crashlytics.android.Crashlytics;
+import io.fabric.sdk.android.Fabric;
+import org.sparkr.taiwan_baseball.Model.Game;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -37,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
      */
     private ViewPager mViewPager;
 
+    private Game sendedGame;
+
     private int[] iconResId = {
             R.mipmap.tab_news,
             R.mipmap.tab_rank,
@@ -53,15 +51,28 @@ public class MainActivity extends AppCompatActivity {
             R.mipmap.tab_video_fill
     };
 
+    public void setSendedGame(Game game) {
+        this.sendedGame = game;
+    }
+
+    public Game getSendedGame() {
+        return this.sendedGame;
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
 
-        findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+        View loadingView = findViewById(R.id.loadingPanel);
+        loadingView.setVisibility(View.GONE);
+        loadingView.setClickable(false);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -112,10 +123,10 @@ public class MainActivity extends AppCompatActivity {
             // Return a PlaceholderFragment (defined as a static inner class below).
             //return PlaceholderFragment.newInstance(position + 1);
             switch (position) {
-                case 0: return NewsFragment.newInstance();
-                case 1: return RankFragment.newInstance();
-                case 2: return CalendarFragment.newInstance();
-                case 3: return StatisticsFragment.newInstance();
+                case 3: return NewsFragment.newInstance();
+                case 2: return RankFragment.newInstance();
+                case 0: return CalendarFragment.newInstance();
+                case 1: return StatisticsFragment.newInstance();
                 case 4: return VideoFragment.newInstance();
                 default: return NewsFragment.newInstance();
             }

@@ -6,4 +6,5 @@
     <color name="CPBLBlue">#081b2f</color>
     <color name="white">#ffffff</color>
     <color name="lighterCPBLBlue">#0A223B</color>
+    <color name="gray">#BBBBBB</color>
 </resources>
