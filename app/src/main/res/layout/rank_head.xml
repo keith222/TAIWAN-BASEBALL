@@ -13,7 +13,7 @@
         android:textColor="@color/white"
         android:textSize="20sp"
         android:textStyle="normal"
-        android:text="全年度" />
+        android:text="全年度" android:layout_marginStart="10sp"/>
 
     <TextView
         android:id="@+id/rankTeamTextView"
@@ -24,7 +24,7 @@
         android:layout_marginLeft="10sp"
         android:textSize="17sp"
         android:textColor="@color/white"
-        android:text="隊名" />
+        android:text="隊名" android:layout_marginStart="10sp"/>
 
     <TextView
         android:id="@+id/rankWinTextView"
@@ -36,7 +36,7 @@
         android:textSize="17sp"
         android:textColor="@color/white"
         android:textAlignment="center"
-        android:text="勝" />
+        android:text="勝" android:layout_toStartOf="@+id/rankTieTextView" android:layout_marginEnd="15sp"/>
 
     <TextView
         android:id="@+id/rankTieTextView"
@@ -48,7 +48,7 @@
         android:textSize="17sp"
         android:textColor="@color/white"
         android:textAlignment="center"
-        android:text="和" />
+        android:text="和" android:layout_toStartOf="@+id/rankLoseTextView" android:layout_marginEnd="15sp"/>
 
     <TextView
         android:id="@+id/rankLoseTextView"
@@ -60,7 +60,7 @@
         android:textSize="17sp"
         android:textColor="@color/white"
         android:textAlignment="center"
-        android:text="敗" />
+        android:text="敗" android:layout_toStartOf="@+id/rankRateTextView" android:layout_marginEnd="15sp"/>
 
     <TextView
         android:id="@+id/rankRateTextView"
@@ -72,7 +72,7 @@
         android:textSize="17sp"
         android:textColor="@color/white"
         android:textAlignment="center"
-        android:text="勝率" />
+        android:text="勝率" android:layout_toStartOf="@+id/rankGbTextView" android:layout_marginEnd="15sp"/>
 
     <TextView
         android:id="@+id/rankGbTextView"
@@ -84,5 +84,5 @@
         android:textColor="@color/white"
         android:textSize="17sp"
         android:textAlignment="center"
-        android:text="勝差" />
+        android:text="勝差" android:layout_alignParentEnd="true" android:layout_marginEnd="15sp"/>
 </RelativeLayout>

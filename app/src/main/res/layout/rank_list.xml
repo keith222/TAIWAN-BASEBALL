@@ -10,6 +10,8 @@
         android:layout_height="55sp"
         android:layout_centerVertical="true"
         android:layout_marginLeft="14sp"
+        android:layout_marginStart="14sp"
+        android:contentDescription="teamImage"
         app:srcCompat="@color/white" />
 
     <TextView
@@ -22,7 +24,7 @@
         android:textSize="17sp"
         android:textAlignment="center"
         android:textColor="#000"
-        android:text="120" />
+        android:text="120" android:layout_toStartOf="@+id/tieTextView" android:layout_marginEnd="14sp" />
 
     <TextView
         android:id="@+id/tieTextView"
@@ -34,7 +36,7 @@
         android:textSize="17sp"
         android:textAlignment="center"
         android:textColor="#000"
-        android:text="120" />
+        android:text="120" android:layout_toStartOf="@+id/loseTextView" android:layout_marginEnd="14sp" />
 
     <TextView
         android:id="@+id/loseTextView"
@@ -46,7 +48,7 @@
         android:textSize="17sp"
         android:textAlignment="center"
         android:textColor="#000"
-        android:text="120" />
+        android:text="120" android:layout_toStartOf="@+id/rateTextView" android:layout_marginEnd="14sp" />
 
     <TextView
         android:id="@+id/rateTextView"
@@ -58,7 +60,7 @@
         android:textSize="17sp"
         android:textAlignment="center"
         android:textColor="#000"
-        android:text="0.483" />
+        android:text="0.483" android:layout_toStartOf="@+id/gbTextView" android:layout_marginEnd="14sp" />
 
     <TextView
         android:id="@+id/gbTextView"
@@ -70,5 +72,13 @@
         android:textAlignment="center"
         android:textColor="#000"
         android:textSize="17sp"
-        android:text="14.5" />
+        android:text="14.5" android:layout_alignParentEnd="true" android:layout_marginEnd="15sp" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="1sp"
+        android:layout_alignParentBottom="true"
+        android:background="#EFEFF4">
+
+    </RelativeLayout>
 </RelativeLayout>

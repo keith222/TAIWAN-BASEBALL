@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="55dp">
+
+    <TextView
+        android:id="@+id/categoryTextView"
+        android:background="@color/CPBLBlue"
+        android:layout_width="40sp"
+        android:layout_height="40sp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="17sp"
+        android:gravity="center"
+        android:textSize="14sp"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:text="AVG" android:layout_marginStart="17sp"/>
+
+    <TextView
+        android:id="@+id/statsNameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/categoryTextView"
+        android:layout_marginLeft="15sp"
+        android:layout_toRightOf="@+id/categoryTextView"
+        android:textSize="18sp"
+        android:textColor="#000"
+        android:text="高國輝" android:layout_marginStart="15sp" android:layout_toEndOf="@+id/categoryTextView"/>
+
+    <TextView
+        android:id="@+id/statsTeamTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/categoryTextView"
+        android:layout_alignLeft="@+id/statsNameTextView"
+        android:layout_alignStart="@+id/statsNameTextView"
+        android:text="富邦悍將"
+        android:textColor="#9B9B9B"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/statsTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="18dp"
+        android:textColor="#000"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        android:text="0.348" android:layout_alignParentEnd="true" android:layout_marginEnd="18dp"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="1sp"
+        android:layout_alignLeft="@+id/statsTeamTextView"
+        android:layout_alignParentBottom="true"
+        android:layout_alignStart="@+id/statsTeamTextView"
+        android:background="#EFEFF4">
+
+    </RelativeLayout>
+
+</RelativeLayout>

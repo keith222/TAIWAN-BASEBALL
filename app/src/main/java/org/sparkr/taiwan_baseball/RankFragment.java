@@ -125,7 +125,7 @@ public class RankFragment extends Fragment {
                             if(teamNodes.indexOf(teamNode) == 0){ continue; }
 
                             Elements nodes = teamNode.select("td");
-                            List<String> rankElement = new ArrayList<String>();
+                            List<String> rankElement = new ArrayList<>();
 
                             for(Element node: nodes) {
                                 if(nodes.indexOf(node) >= 6) { break; }

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="55dp">
+
+    <TextView
+        android:id="@+id/numTextView"
+        android:layout_width="40sp"
+        android:layout_height="40sp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="18sp"
+        android:gravity="center"
+        android:textColor="#000"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        android:text="1" android:layout_alignParentStart="true" android:layout_marginStart="18sp"/>
+
+    <TextView
+        android:id="@+id/nameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/numTextView"
+        android:layout_marginLeft="15sp"
+        android:layout_toRightOf="@+id/numTextView"
+        android:textColor="#000"
+        android:textSize="18sp"
+        android:text="高國輝" android:layout_marginStart="15sp" android:layout_toEndOf="@+id/numTextView"/>
+
+    <TextView
+        android:id="@+id/teamTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/nameTextView"
+        android:layout_below="@+id/nameTextView"
+        android:textColor="#9B9B9B"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:text="富邦悍將" android:layout_alignStart="@+id/nameTextView"/>
+
+    <TextView
+        android:id="@+id/statsTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="18dp"
+        android:textColor="#000"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        android:text="0.348" android:layout_alignParentEnd="true" android:layout_marginEnd="18dp"/>
+</RelativeLayout>
