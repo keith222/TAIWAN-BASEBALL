@@ -75,8 +75,6 @@ public class NewsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getActivity().findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
-
         newsList = new ArrayList<>();
         adapter = new NewsAdapter(newsList);
         fetchNews(page);
@@ -138,17 +136,21 @@ public class NewsFragment extends Fragment {
     }
 
     private void fetchNews(final int newPage) {
+        getActivity().findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+
         Request request = new Request.Builder().url(this.getString(R.string.CPBLSourceURL) + "news/lists/news_lits.html?per_page=" + newPage).build();
         Call mcall = client.newCall(request);
         mcall.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                getActivity().runOnUiThread(new Runnable() {//这是Activity的方法，会在主线程执行任务
-                    @Override
-                    public void run() {
-                        Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
-                    }
-                });
+                if(getActivity() != null) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
             }
 
             @Override
@@ -192,17 +194,19 @@ public class NewsFragment extends Fragment {
                         }
                     });
 
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            adapter.notifyDataSetChanged();
+                    if(getActivity() != null) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                adapter.notifyDataSetChanged();
 
-                            if(getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE) {
-                                getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                                if (getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE) {
+                                    getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                                }
+
                             }
-
-                        }
-                    });
+                        });
+                    }
 
 
                 } catch (Exception e) {

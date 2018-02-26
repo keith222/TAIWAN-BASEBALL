@@ -9,11 +9,14 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import com.crashlytics.android.Crashlytics;
 import io.fabric.sdk.android.Fabric;
 import org.sparkr.taiwan_baseball.Model.Game;
+
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -34,6 +37,10 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager mViewPager;
 
     private Game sendedGame;
+    private List<String> moreData;
+    private String[] playerData;
+    private String tempTitle;
+    private int selectedIndex = 0;
 
     private int[] iconResId = {
             R.mipmap.tab_news,
@@ -51,6 +58,14 @@ public class MainActivity extends AppCompatActivity {
             R.mipmap.tab_video_fill
     };
 
+    private String[] titleArray = {
+            "聯盟新聞",
+            "聯盟排名",
+            "賽事日程",
+            "個人成績",
+            "聯盟影音"
+    };
+
     public void setSendedGame(Game game) {
         this.sendedGame = game;
     }
@@ -59,6 +74,25 @@ public class MainActivity extends AppCompatActivity {
         return this.sendedGame;
     }
 
+    public void setMoreData(List<String> moreData) {
+        this.moreData = moreData;
+    }
+
+    public List<String> getMoreData() {
+        return this.moreData;
+    }
+
+    public void setPlayerData(String[] playerData) {
+        this.playerData = playerData;
+    }
+
+    public String[] getPlayerData() {
+        return this.playerData;
+    }
+
+    public void setTempTitle(String tempTitle) {
+        this.tempTitle = tempTitle;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
         loadingView.setClickable(false);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //toolbar.getNavigationIcon().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
         setSupportActionBar(toolbar);
 
         // Create the adapter that will return a fragment for each of the three
@@ -84,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
         tabLayout.getTabAt(0).setIcon(iconResId[0]);
+        getSupportActionBar().setTitle(titleArray[0]);
         for(int i = 1; i < tabLayout.getTabCount(); i++) {
             tabLayout.getTabAt(i).setIcon(iconResId[i]);
         }
@@ -91,6 +127,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 tab.setIcon(selectedIconresId[tab.getPosition()]);
+                getSupportActionBar().setTitle(titleArray[tab.getPosition()]);
+                selectedIndex = tab.getPosition();
             }
 
             @Override
@@ -104,8 +142,36 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    
-  
+    @Override
+    public void onBackPressed() {
+        FragmentManager fm = this.getSupportFragmentManager();
+
+        if (fm.getBackStackEntryCount() == 0) {
+            this.finish();
+
+        } else {
+            if(fm.getBackStackEntryCount() < 2){
+                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                getSupportActionBar().setDisplayShowHomeEnabled(false);
+            }
+
+            if(!tempTitle.isEmpty()) {
+                getSupportActionBar().setTitle(tempTitle);
+                tempTitle = "";
+
+            } else {
+                getSupportActionBar().setTitle(titleArray[selectedIndex]);
+            }
+
+            fm.popBackStack();
+        }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -123,10 +189,10 @@ public class MainActivity extends AppCompatActivity {
             // Return a PlaceholderFragment (defined as a static inner class below).
             //return PlaceholderFragment.newInstance(position + 1);
             switch (position) {
-                case 3: return NewsFragment.newInstance();
-                case 2: return RankFragment.newInstance();
-                case 0: return CalendarFragment.newInstance();
-                case 1: return StatisticsFragment.newInstance();
+                case 0: return NewsFragment.newInstance();
+                case 1: return RankFragment.newInstance();
+                case 2: return CalendarFragment.newInstance();
+                case 3: return StatisticsFragment.newInstance();
                 case 4: return VideoFragment.newInstance();
                 default: return NewsFragment.newInstance();
             }

@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -69,14 +68,15 @@ public class GameFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        ((MainActivity)getActivity()).getSupportActionBar().setTitle("賽事資訊");
+        ((MainActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((MainActivity)getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
         getActivity().findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        ActionBar actionBar = ((MainActivity)getActivity()).getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
 
         final View view = inflater.inflate(R.layout.fragment_game, container, false);        TextView textView = new TextView(getActivity());
 
@@ -110,16 +110,17 @@ public class GameFragment extends Fragment {
                             @Override
                             public void run() {
                                 ((WebView) view.findViewById(R.id.gameWebView)).loadData(boxHtmlString, "text/html; charset=utf-8", "UTF-8");
+                                ((WebView) view.findViewById(R.id.gameWebView)).invalidate();
                             }
                         });
 
                         break;
                     case R.id.playButton:
-                        Log.d("segement","play");
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 ((WebView) view.findViewById(R.id.gameWebView)).loadData(gameHtmlString, "text/html; charset=utf-8", "UTF-8");
+                                ((WebView) view.findViewById(R.id.gameWebView)).invalidate();
                             }
                         });
 
@@ -150,8 +151,8 @@ public class GameFragment extends Fragment {
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onPause() {
+        super.onPause();
         timer.cancel();
         Log.d("GameView", "onDestroyView");
     }
@@ -220,15 +221,17 @@ public class GameFragment extends Fragment {
         mCall.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE && getActivity().findViewById(R.id.gameRecyclerView).getVisibility() == View.VISIBLE) {
-                            getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                if(getActivity() != null) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE && getActivity().findViewById(R.id.gameRecyclerView).getVisibility() == View.VISIBLE) {
+                                getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                            }
+                            Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
-                        Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
-                    }
-                });
+                    });
+                }
             }
 
             @Override
@@ -247,12 +250,15 @@ public class GameFragment extends Fragment {
                     final String scoreBoard = doc.select(".score_board").toString();
                     if(!scoreBoard.isEmpty()) {
                         final String boardCss = "<style>table{width:100%;}.score_board{background-color: #081B2F;overflow:hidden;}.gap_l20{margin-left:10px;}.score_board_side,.score_board_main{float:left;}table.score_table th{color:#b2b1b1}table.score_table th, table.score_table td{height:34px;padding:0 3px;}table.score_table tr:nth-child(2) td{border-bottom:1px solid #0d0d0d;}table.score_table td{color:#fff;}table.score_table td span {margin: 0 2px;padding: 1px 3px;width: 20px;}table.score_table tr:nth-child(3) td {border-top: 1px solid #575757;}</style>";
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                ((WebView) view.findViewById(R.id.scoreWebView)).loadData(boardCss+scoreBoard, "text/html; charset=utf-8", "UTF-8");
-                            }
-                        });
+
+                        if(getActivity() != null) {
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ((WebView) view.findViewById(R.id.scoreWebView)).loadData(boardCss + scoreBoard, "text/html; charset=utf-8", "UTF-8");
+                                }
+                            });
+                        }
                     }
 
                 } catch (Exception e) {
@@ -266,15 +272,17 @@ public class GameFragment extends Fragment {
         mCall.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE && getActivity().findViewById(R.id.gameRecyclerView).getVisibility() == View.VISIBLE) {
-                            getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                if(getActivity() != null) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE && getActivity().findViewById(R.id.gameRecyclerView).getVisibility() == View.VISIBLE) {
+                                getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                            }
+                            Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
-                        Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
-                    }
-                });
+                    });
+                }
             }
 
             @Override
@@ -300,16 +308,18 @@ public class GameFragment extends Fragment {
                     boxHtmlString += "<h3 style='color:#081B2F;margin:20px 0 10px 10px;'>賽後簡報成績</h3>";
                     boxHtmlString += doc.select(".half_block.right > p.box_note").get(2).toString();
 
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            ((WebView) view.findViewById(R.id.gameWebView)).loadData(boxHtmlString, "text/html; charset=utf-8", "UTF-8");
+                    if(getActivity() != null) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                ((WebView) view.findViewById(R.id.gameWebView)).loadData(boxHtmlString, "text/html; charset=utf-8", "UTF-8");
 
-                            if(getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE && getActivity().findViewById(R.id.gameRecyclerView).getVisibility() == View.VISIBLE) {
-                                getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                                if (getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE && getActivity().findViewById(R.id.gameRecyclerView).getVisibility() == View.VISIBLE) {
+                                    getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
 
                 } catch (Exception e) {
                     Log.d("error:", e.toString());

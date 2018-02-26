@@ -1,0 +1,178 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context="org.sparkr.taiwan_baseball.PlayerFragment">
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:android="http://schemas.android.com/apk/res/android" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="700sp">
+
+            <ImageView
+                android:id="@+id/gameImageView"
+                android:layout_width="match_parent"
+                android:layout_height="245sp"
+                android:adjustViewBounds="true"
+                android:contentDescription="playerPhoto"
+                android:scaleType="centerCrop"
+                android:src="@mipmap/logo" />
+
+            <ImageView
+                android:id="@+id/headImageView"
+                android:layout_width="92sp"
+                android:layout_height="122sp"
+                android:layout_alignBottom="@+id/gameImageView"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginBottom="8sp"
+                android:layout_marginLeft="15sp"
+                android:layout_marginStart="15sp"
+                android:adjustViewBounds="true"
+                android:contentDescription="playerProfile"
+                android:scaleType="centerCrop"
+                android:src="@color/gray" />
+
+            <TextView
+                android:id="@+id/nameTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/dataTextView"
+                android:layout_alignLeft="@+id/dataTextView"
+                android:layout_alignStart="@+id/dataTextView"
+                android:layout_marginBottom="5sp"
+                android:background="#4D000000"
+                android:textSize="21sp"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:text="選手 00 | 球隊" />
+
+            <TextView
+                android:id="@+id/dataTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/headImageView"
+                android:layout_marginBottom="5sp"
+                android:layout_marginLeft="10sp"
+                android:layout_marginStart="10sp"
+                android:layout_toEndOf="@+id/headImageView"
+                android:layout_toRightOf="@+id/headImageView"
+                android:background="#4D000000"
+                android:textSize="15sp"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:text="---｜---｜---" />
+
+            <TextView
+                android:id="@+id/statsTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/gameImageView"
+                android:layout_marginLeft="15sp"
+                android:layout_marginStart="15sp"
+                android:layout_marginTop="15sp"
+                android:textSize="17sp"
+                android:textColor="#686868"
+                android:textStyle="bold"
+                android:text="打擊成績" />
+
+            <WebView
+                android:id="@+id/statsWebView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/statsTextView"
+                android:layout_marginLeft="15sp"
+                android:layout_marginRight="15sp"
+                android:layout_marginTop="5sp" />
+
+            <TextView
+                android:id="@+id/fieldTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/statsWebView"
+                android:layout_marginLeft="15sp"
+                android:layout_marginStart="15sp"
+                android:layout_marginTop="15sp"
+                android:textSize="17sp"
+                android:textColor="#686868"
+                android:textStyle="bold"
+                android:text="守備成績" />
+
+            <WebView
+                android:id="@+id/fieldingWebView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/fieldTextView"
+                android:layout_marginLeft="15sp"
+                android:layout_marginRight="15sp"
+                android:layout_marginTop="5sp" />
+
+            <TextView
+                android:id="@+id/teamStatsTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/fieldingWebView"
+                android:layout_marginLeft="15sp"
+                android:layout_marginStart="15sp"
+                android:layout_marginTop="15sp"
+                android:textSize="17sp"
+                android:textColor="#686868"
+                android:textStyle="bold"
+                android:text="對戰成績" />
+
+            <WebView
+                android:id="@+id/teamStatsWebView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/teamStatsTextView"
+                android:layout_marginLeft="15sp"
+                android:layout_marginRight="15sp"
+                android:layout_marginTop="5sp" />
+
+            <TextView
+                android:id="@+id/singleGameTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/teamStatsWebView"
+                android:layout_marginLeft="15sp"
+                android:layout_marginStart="15sp"
+                android:layout_marginTop="15sp"
+                android:textSize="17sp"
+                android:textColor="#686868"
+                android:textStyle="bold"
+                android:text="單場最高成績" />
+
+            <WebView
+                android:id="@+id/singleGameWebView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/singleGameTextView"
+                android:layout_marginLeft="15sp"
+                android:layout_marginRight="15sp"
+                android:layout_marginTop="5sp" />
+
+        </RelativeLayout>
+    </android.support.v4.widget.NestedScrollView>
+</FrameLayout>

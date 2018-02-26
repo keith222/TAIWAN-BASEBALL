@@ -88,6 +88,7 @@ public class CalendarFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_calendar, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.gameRecyclerView);
@@ -147,15 +148,17 @@ public class CalendarFragment extends Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.getChildrenCount() < 1) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if(getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE && getActivity().findViewById(R.id.gameRecyclerView).getVisibility() == View.VISIBLE) {
-                                getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                    if(getActivity() != null) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE && getActivity().findViewById(R.id.gameRecyclerView).getVisibility() == View.VISIBLE) {
+                                    getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                                }
+                                Toast.makeText(getContext(), "未有比賽資料。", Toast.LENGTH_LONG).show();
                             }
-                            Toast.makeText(getContext(), "未有比賽資料。", Toast.LENGTH_LONG).show();
-                        }
-                    });
+                        });
+                    }
 
                     return;
                 }
@@ -175,18 +178,20 @@ public class CalendarFragment extends Fragment {
 
                 }
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ((TextView) getActivity().findViewById(R.id.calendarTextView)).setText(year + "年" + month + "月");
+                if(getActivity() != null) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ((TextView) getActivity().findViewById(R.id.calendarTextView)).setText(year + "年" + month + "月");
 
-                        adapter.notifyDataSetChanged();
+                            adapter.notifyDataSetChanged();
 
-                        if(getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE && getActivity().findViewById(R.id.gameRecyclerView).getVisibility() == View.VISIBLE) {
-                            getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                            if (getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE && getActivity().findViewById(R.id.gameRecyclerView).getVisibility() == View.VISIBLE) {
+                                getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                            }
                         }
-                    }
-                });
+                    });
+                }
 
                 dataReference.removeEventListener(this);
             }
@@ -216,12 +221,14 @@ public class CalendarFragment extends Fragment {
                 section.removeAllItem();
                 section.addItem(gameList);
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        adapter.notifyDataSetChanged();
-                    }
-                });
+                if(getActivity() != null) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            adapter.notifyDataSetChanged();
+                        }
+                    });
+                }
             }
 
             @Override
@@ -299,12 +306,11 @@ public class CalendarFragment extends Fragment {
             itemHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    Log.d("test",gameList.get(position).toString());
                     ((MainActivity)getActivity()).setSendedGame(gameList.get(position));
 
                     Fragment gameFragment = new GameFragment();
-                    FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-                    transaction.replace(R.id.fragment_calendar, gameFragment);
+                    FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                    transaction.add(R.id.fragment_calendar, gameFragment);
                     transaction.addToBackStack(null);
                     transaction.commit();
                 }

@@ -4,6 +4,7 @@ package org.sparkr.taiwan_baseball;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -44,7 +45,7 @@ public class StatisticsFragment extends Fragment {
     private List<Stats> battingStats;
     private List<Stats> pitchingStats;
     private StatisticsAdapter adapter;
-
+    private String type = "0"; //0=>batting; 1=>pitching
     public StatisticsFragment() {
         // Required empty public constructor
     }
@@ -65,6 +66,8 @@ public class StatisticsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        getActivity().findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
 
         battingStats = new ArrayList<>();
         pitchingStats = new ArrayList<>();
@@ -94,10 +97,12 @@ public class StatisticsFragment extends Fragment {
                     case R.id.batButton:
                         adapter.stats = battingStats;
                         adapter.notifyDataSetChanged();
+                        type = "0";
                         break;
                     case R.id.pitchButton:
                         adapter.stats = pitchingStats;
                         adapter.notifyDataSetChanged();
+                        type = "1";
                         break;
                 }
             }
@@ -111,15 +116,17 @@ public class StatisticsFragment extends Fragment {
         mcall.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                getActivity().runOnUiThread(new Runnable() {//这是Activity的方法，会在主线程执行任务
-                    @Override
-                    public void run() {
-                        if(getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE) {
-                            getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                if(getActivity() != null) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE) {
+                                getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                            }
+                            Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
-                        Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
-                    }
-                });
+                    });
+                }
             }
 
             @Override
@@ -164,20 +171,32 @@ public class StatisticsFragment extends Fragment {
                     adapter.setOnClick(new StatisticsAdapter.OnItemClicked(){
                         @Override
                         public void onItemClick(int position) {
-                            Stats selectedStats = (Stats) statsList.get(position);
+                            List<String> moreData = new ArrayList<>();
+                            moreData.add(((Integer.parseInt(type) == 0)? battingStats:pitchingStats).get(position).getMoreUrl());
+                            moreData.add(((Integer.parseInt(type) == 0)? battingStats:pitchingStats).get(position).getCategory());
+                            moreData.add(type);
+                            ((MainActivity)getActivity()).setMoreData(moreData);
+
+                            Fragment statsListFragment = new StatsListFragment();
+                            FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                            transaction.replace(R.id.fragment_statistics, statsListFragment);
+                            transaction.addToBackStack(null);
+                            transaction.commit();
                         }
                     });
 
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            adapter.notifyDataSetChanged();
+                    if(getActivity() != null) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                adapter.notifyDataSetChanged();
 
-                            if(getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE) {
-                                getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                                if (getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE) {
+                                    getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
 
 
                 } catch (Exception e) {
@@ -265,6 +284,7 @@ public class StatisticsFragment extends Fragment {
             holder.statsNameTextView.setText(statsData.getName());
             holder.statsTeamTextView.setText(statsData.getTeam());
             holder.statsTextView.setText(statsData.getStats());
+            holder.moreURL = statsData.getMoreUrl();
             holder.itemView.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v) {

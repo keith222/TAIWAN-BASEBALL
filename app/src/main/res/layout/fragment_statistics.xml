@@ -1,7 +1,9 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:segmentedgroup="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/fragment_statistics"
     tools:context="org.sparkr.taiwan_baseball.StatisticsFragment">
 
     <LinearLayout
@@ -17,36 +19,42 @@
             tools:context="info.hoang8f.android.segmented.SampleActivity$PlaceholderFragment">
 
             <info.hoang8f.android.segmented.SegmentedGroup
-                xmlns:segmentedgroup="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/statsSegmented"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:orientation="horizontal"
-                segmentedgroup:sc_tint_color="@color/CPBLBlue"
-                segmentedgroup:sc_checked_text_color="@color/white"
                 segmentedgroup:sc_border_width="1sp"
-                segmentedgroup:sc_corner_radius="5sp">
+                segmentedgroup:sc_checked_text_color="@color/white"
+                segmentedgroup:sc_corner_radius="5sp"
+                segmentedgroup:sc_tint_color="@color/CPBLBlue">
 
                 <RadioButton
                     android:id="@+id/batButton"
+                    style="@style/RadioButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="打擊成績"
-                    android:checked="true"
                     android:layout_weight="1"
-                    style="@style/RadioButton" />
+                    android:checked="true"
+                    android:text="打擊成績" />
 
                 <RadioButton
                     android:id="@+id/pitchButton"
+                    style="@style/RadioButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="投手成績"
                     android:layout_weight="1"
-                    style="@style/RadioButton" />
+                    android:text="投手成績" />
             </info.hoang8f.android.segmented.SegmentedGroup>
 
         </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="1sp"
+            android:background="#B8B8B8" >
+
+        </RelativeLayout>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/statisticsRecyclerView"

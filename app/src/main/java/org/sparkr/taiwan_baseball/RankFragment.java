@@ -94,19 +94,20 @@ public class RankFragment extends Fragment {
         return view;
     }
 
-
     public void fetchRank(final String year) {
         Request request = new Request.Builder().url(this.getString(R.string.CPBLSourceURL) + "standing/year/"+ year +".html").build();
         Call mcall = client.newCall(request);
         mcall.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                getActivity().runOnUiThread(new Runnable() {//这是Activity的方法，会在主线程执行任务
-                    @Override
-                    public void run() {
-                        Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
-                    }
-                });
+                if(getActivity() != null) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
             }
 
             @Override
@@ -149,16 +150,18 @@ public class RankFragment extends Fragment {
                         adapter.addSection(new RankSection("全年度", rank.subList(8,12)));
                     }
 
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            adapter.notifyDataSetChanged();
+                    if(getActivity() != null) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                adapter.notifyDataSetChanged();
 
-                            if(getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE && getActivity().findViewById(R.id.rankRecyclerView).getVisibility() == View.VISIBLE) {
-                                getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                                if (getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE && getActivity().findViewById(R.id.rankRecyclerView).getVisibility() == View.VISIBLE) {
+                                    getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
 
                 } catch (Exception e) {
                     Log.d("error:", e.toString());
