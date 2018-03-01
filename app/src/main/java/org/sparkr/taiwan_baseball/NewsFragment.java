@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,11 +48,11 @@ public class NewsFragment extends Fragment {
     private OkHttpClient client = new OkHttpClient();
     private List newsList;
     private NewsAdapter adapter;
+    private RecyclerView recyclerView;
     private int page = 0;
-    private int previousTotal = 0;
     private int visibleThreshold = 4;
-    private Boolean loading = true;
-    int firstVisibleItem, visibleItemCount, totalItemCount;
+    private Boolean isLoading;
+    int lastVisibleItem, totalItemCount;
 
     public NewsFragment() {
         // Required empty public constructor
@@ -77,6 +78,9 @@ public class NewsFragment extends Fragment {
 
         newsList = new ArrayList<>();
         adapter = new NewsAdapter(newsList);
+
+        getActivity().findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+
         fetchNews(page);
 
     }
@@ -86,7 +90,7 @@ public class NewsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_news, container, false);
 
-        final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.newsRecyclerView);
+        recyclerView = (RecyclerView) view.findViewById(R.id.newsRecyclerView);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
@@ -110,24 +114,22 @@ public class NewsFragment extends Fragment {
 
                 if(!isScrolled) { return; }
 
-                visibleItemCount = recyclerView.getChildCount();
                 totalItemCount = layoutManager.getItemCount();
-                firstVisibleItem = layoutManager.findFirstVisibleItemPosition();
+                lastVisibleItem = layoutManager.findLastVisibleItemPosition();
 
-                if(loading) {
-                    if(totalItemCount > previousTotal) {
-                        loading = false;
-                        previousTotal = totalItemCount;
-                    }
-                }
+                if (!isLoading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
+                    recyclerView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            newsList.add(null);
+                            adapter.notifyItemInserted(newsList.size() - 1);
+                        }
+                    });
 
-                if (!loading && ((totalItemCount - visibleItemCount) <= (firstVisibleItem + visibleThreshold))) {
                     page++;
                     fetchNews(page);
-
-                    loading = true;
+                    isLoading = true;
                 }
-
             }
         });
 
@@ -135,9 +137,11 @@ public class NewsFragment extends Fragment {
         return view;
     }
 
-    private void fetchNews(final int newPage) {
-        getActivity().findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+    public void setLoaded() {
+        isLoading = false;
+    }
 
+    private void fetchNews(final int newPage) {
         Request request = new Request.Builder().url(this.getString(R.string.CPBLSourceURL) + "news/lists/news_lits.html?per_page=" + newPage).build();
         Call mcall = client.newCall(request);
         mcall.enqueue(new Callback() {
@@ -155,6 +159,10 @@ public class NewsFragment extends Fragment {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                if(newsList.size() > 0) {
+                    newsList.remove(newsList.size() - 1);
+                }
+
                 final String resStr = response.body().string();
                 News news;
 
@@ -194,20 +202,18 @@ public class NewsFragment extends Fragment {
                         }
                     });
 
-                    if(getActivity() != null) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                adapter.notifyDataSetChanged();
+                    recyclerView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            adapter.notifyItemRemoved(newsList.size());
+                            adapter.notifyDataSetChanged();
+                            setLoaded();
 
-                                if (getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE) {
-                                    getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
-                                }
-
+                            if (getActivity() != null && getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE) {
+                                getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
                             }
-                        });
-                    }
-
+                        }
+                    });
 
                 } catch (Exception e) {
                     Log.d("error:", e.toString());
@@ -216,7 +222,7 @@ public class NewsFragment extends Fragment {
         });
     }
 
-    public static class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
+    public static class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         private List<News> news;
         private OnItemClicked onClick;
@@ -229,14 +235,14 @@ public class NewsFragment extends Fragment {
             this.news = news;
         }
 
-        public class ViewHolder extends RecyclerView.ViewHolder {
+        public class NewsViewHolder extends RecyclerView.ViewHolder {
 
             private final TextView newsTitleTextView;
             private final TextView newsDateTextView;
             private final ImageView newsImageView;
             private String newsURL;
 
-            public ViewHolder(View itemView) {
+            public NewsViewHolder(View itemView) {
                 super(itemView);
 
                 newsTitleTextView = (TextView) itemView.findViewById(R.id.newsTitleTextView);
@@ -245,29 +251,52 @@ public class NewsFragment extends Fragment {
             }
         }
 
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            Context context = parent.getContext();
-            View view = LayoutInflater.from(context).inflate(R.layout.news_list, parent, false);
-            ViewHolder viewHolder = new ViewHolder(view);
+        public class LoadingViewHolder extends RecyclerView.ViewHolder {
+            public ProgressBar progressBar;
 
-            return viewHolder;
+            public LoadingViewHolder(View view) {
+                super(view);
+                progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+            }
         }
 
         @Override
-        public void onBindViewHolder(ViewHolder holder, final int position) {
-            News newsData = news.get(position);
-            holder.newsTitleTextView.setText(newsData.getTitle());
-            holder.newsDateTextView.setText(newsData.getDate());
-            holder.newsURL = newsData.getNewsUrl();
-            Glide.with(holder.newsImageView.getContext()).load(newsData.getImageUrl()).centerCrop().into(holder.newsImageView);
+        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            Context context = parent.getContext();
 
-            holder.newsImageView.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View v) {
-                    onClick.onItemClick(position);
-                }
-            });
+            if(viewType == 0) {
+                View view = LayoutInflater.from(context).inflate(R.layout.news_list, parent, false);
+                NewsViewHolder newsViewHolder = new NewsViewHolder(view);
+                return newsViewHolder;
+
+            } else {
+                View view = LayoutInflater.from(context).inflate(R.layout.item_loading, parent, false);
+                LoadingViewHolder loadingViewHolder = new LoadingViewHolder(view);
+                return loadingViewHolder;
+            }
+        }
+
+        @Override
+        public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+            if(holder instanceof NewsViewHolder) {
+                News newsData = news.get(position);
+                NewsViewHolder newsViewHolder = (NewsViewHolder)holder;
+                newsViewHolder.newsTitleTextView.setText(newsData.getTitle());
+                newsViewHolder.newsDateTextView.setText(newsData.getDate());
+                newsViewHolder.newsURL = newsData.getNewsUrl();
+                Glide.with(newsViewHolder.newsImageView.getContext()).load(newsData.getImageUrl()).centerCrop().into(newsViewHolder.newsImageView);
+
+                newsViewHolder.newsImageView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        onClick.onItemClick(position);
+                    }
+                });
+
+            } else if(holder instanceof LoadingViewHolder){
+                LoadingViewHolder loadingViewHolder = (LoadingViewHolder)holder;
+                loadingViewHolder.progressBar.setIndeterminate(true);
+            }
         }
 
         @Override
@@ -275,9 +304,15 @@ public class NewsFragment extends Fragment {
             return news.size();
         }
 
+        @Override
+        public int getItemViewType(int position) {
+            return (news.get(position) == null) ? 1 : 0;
+        }
+
         public void setOnClick(OnItemClicked onClick) {
             this.onClick = onClick;
         }
+
     }
 
 }

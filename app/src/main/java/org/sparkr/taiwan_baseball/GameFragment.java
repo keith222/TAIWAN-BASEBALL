@@ -153,8 +153,9 @@ public class GameFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        timer.cancel();
-        Log.d("GameView", "onDestroyView");
+        if(timer != null) {
+            timer.cancel();
+        }
     }
 
     public class GameTimerTask extends TimerTask {
@@ -225,9 +226,7 @@ public class GameFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE && getActivity().findViewById(R.id.gameRecyclerView).getVisibility() == View.VISIBLE) {
-                                getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
-                            }
+                            getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
                             Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
                     });
@@ -262,7 +261,16 @@ public class GameFragment extends Fragment {
                     }
 
                 } catch (Exception e) {
-                    Log.d("error:", e.toString());
+                    Log.d("GameError", e.toString());
+                    if(getActivity() != null) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                                Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
                 }
             }
         });
@@ -276,7 +284,7 @@ public class GameFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE && getActivity().findViewById(R.id.gameRecyclerView).getVisibility() == View.VISIBLE) {
+                            if (getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE) {
                                 getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
                             }
                             Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
@@ -314,7 +322,7 @@ public class GameFragment extends Fragment {
                             public void run() {
                                 ((WebView) view.findViewById(R.id.gameWebView)).loadData(boxHtmlString, "text/html; charset=utf-8", "UTF-8");
 
-                                if (getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE && getActivity().findViewById(R.id.gameRecyclerView).getVisibility() == View.VISIBLE) {
+                                if (getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE) {
                                     getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
                                 }
                             }
@@ -322,7 +330,16 @@ public class GameFragment extends Fragment {
                     }
 
                 } catch (Exception e) {
-                    Log.d("error:", e.toString());
+                    Log.d("GameError2", e.toString());
+                    if(getActivity() != null) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                                Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
                 }
             }
         });

@@ -43,6 +43,7 @@ public class RankFragment extends Fragment {
 
     private OkHttpClient client = new OkHttpClient();
     private SectionedRecyclerViewAdapter adapter;
+    private RecyclerView recyclerView;
 
     public RankFragment() {
         // Required empty public constructor
@@ -54,7 +55,6 @@ public class RankFragment extends Fragment {
      *
      * @return A new instance of fragment RankFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static RankFragment newInstance() {
         RankFragment fragment = new RankFragment();
         Bundle args = new Bundle();
@@ -84,7 +84,7 @@ public class RankFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_rank, container, false);
 
-        final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.rankRecyclerView);
+        recyclerView = (RecyclerView) view.findViewById(R.id.rankRecyclerView);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
@@ -150,18 +150,12 @@ public class RankFragment extends Fragment {
                         adapter.addSection(new RankSection("全年度", rank.subList(8,12)));
                     }
 
-                    if(getActivity() != null) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                adapter.notifyDataSetChanged();
-
-                                if (getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE && getActivity().findViewById(R.id.rankRecyclerView).getVisibility() == View.VISIBLE) {
-                                    getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
-                                }
-                            }
-                        });
-                    }
+                    recyclerView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            adapter.notifyDataSetChanged();
+                        }
+                    });
 
                 } catch (Exception e) {
                     Log.d("error:", e.toString());

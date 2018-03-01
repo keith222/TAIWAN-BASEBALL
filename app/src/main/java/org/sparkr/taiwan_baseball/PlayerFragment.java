@@ -1,7 +1,6 @@
 package org.sparkr.taiwan_baseball;
 
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -14,7 +13,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -89,7 +87,7 @@ public class PlayerFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE && getActivity().findViewById(R.id.gameRecyclerView).getVisibility() == View.VISIBLE) {
+                            if (getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE) {
                                 getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
                             }
                             Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
@@ -160,6 +158,16 @@ public class PlayerFragment extends Fragment {
                     }
                 } catch (Exception e) {
                     Log.d("error:", e.toString());
+
+                    if(getActivity() != null) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                                Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
                 }
             }
         });

@@ -44,6 +44,7 @@ public class StatisticsFragment extends Fragment {
     private List<Stats> statsList;
     private List<Stats> battingStats;
     private List<Stats> pitchingStats;
+    private RecyclerView recyclerView;
     private StatisticsAdapter adapter;
     private String type = "0"; //0=>batting; 1=>pitching
     public StatisticsFragment() {
@@ -82,7 +83,7 @@ public class StatisticsFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_statistics, container, false);
 
-        final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.statisticsRecyclerView);
+        recyclerView = (RecyclerView) view.findViewById(R.id.statisticsRecyclerView);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
@@ -185,19 +186,16 @@ public class StatisticsFragment extends Fragment {
                         }
                     });
 
-                    if(getActivity() != null) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                adapter.notifyDataSetChanged();
+                    recyclerView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            adapter.notifyDataSetChanged();
 
-                                if (getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE) {
-                                    getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
-                                }
+                            if (getActivity() != null && getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE) {
+                                getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
                             }
-                        });
-                    }
-
+                        }
+                    });
 
                 } catch (Exception e) {
                     Log.d("error:", e.toString());

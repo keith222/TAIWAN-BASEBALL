@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private Game sendedGame;
     private List<String> moreData;
     private String[] playerData;
-    private String tempTitle;
+    private String tempTitle = "";
     private int selectedIndex = 0;
 
     private int[] iconResId = {
@@ -105,7 +105,6 @@ public class MainActivity extends AppCompatActivity {
         loadingView.setClickable(false);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        //toolbar.getNavigationIcon().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
         setSupportActionBar(toolbar);
 
         // Create the adapter that will return a fragment for each of the three
@@ -126,6 +125,9 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                getSupportActionBar().setDisplayShowHomeEnabled(false);
+
                 tab.setIcon(selectedIconresId[tab.getPosition()]);
                 getSupportActionBar().setTitle(titleArray[tab.getPosition()]);
                 selectedIndex = tab.getPosition();
@@ -144,6 +146,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+
         FragmentManager fm = this.getSupportFragmentManager();
 
         if (fm.getBackStackEntryCount() == 0) {
