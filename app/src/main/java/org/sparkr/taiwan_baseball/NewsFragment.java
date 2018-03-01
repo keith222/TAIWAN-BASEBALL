@@ -159,10 +159,6 @@ public class NewsFragment extends Fragment {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                if(newsList.size() > 0) {
-                    newsList.remove(newsList.size() - 1);
-                }
-
                 final String resStr = response.body().string();
                 News news;
 
@@ -179,7 +175,7 @@ public class NewsFragment extends Fragment {
                         newsList.add(news);
                     }
 
-                    Elements nodes = doc.select(".news_row");
+                    final Elements nodes = doc.select(".news_row");
                     for(Element node: nodes) {
                         if (node.select(".news_row_date").text().isEmpty()) {continue;}
 
@@ -205,8 +201,13 @@ public class NewsFragment extends Fragment {
                     recyclerView.post(new Runnable() {
                         @Override
                         public void run() {
-                            adapter.notifyItemRemoved(newsList.size());
                             adapter.notifyDataSetChanged();
+
+                            if((newsList.size() - nodes.size() - 1) > 0) {
+                                newsList.remove(newsList.size() - nodes.size() - 1);
+                                adapter.notifyItemRemoved(newsList.size());
+                            }
+
                             setLoaded();
 
                             if (getActivity() != null && getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE) {

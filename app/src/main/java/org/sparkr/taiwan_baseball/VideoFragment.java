@@ -155,10 +155,6 @@ public class VideoFragment extends Fragment {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                if(videoList.size() > 0) {
-                    videoList.remove(videoList.size() - 1);
-                }
-
                 final String resStr = response.body().string();
 
                 try {
@@ -166,7 +162,7 @@ public class VideoFragment extends Fragment {
                     Gson gson = gsonBuilder.create();
 
                     JsonObject jsonObject = gson.fromJson(resStr, JsonObject.class);
-                    Video video = gson.fromJson(jsonObject, Video.class);
+                    final Video video = gson.fromJson(jsonObject, Video.class);
 
                     videoList.addAll(video.getVideoItem());
 
@@ -184,8 +180,13 @@ public class VideoFragment extends Fragment {
                     recyclerView.post(new Runnable() {
                         @Override
                         public void run() {
-                            adapter.notifyItemRemoved(videoList.size());
                             adapter.notifyDataSetChanged();
+
+                            if((videoList.size() - video.getVideoItem().size() - 1) > 0) {
+                                videoList.remove(videoList.size() - video.getVideoItem().size() - 1);
+                                adapter.notifyItemRemoved(videoList.size());
+                            }
+
                             setLoaded();
 
                             if (getActivity() != null && getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE) {

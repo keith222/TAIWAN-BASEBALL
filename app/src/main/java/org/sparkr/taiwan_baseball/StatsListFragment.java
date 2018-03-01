@@ -148,14 +148,10 @@ public class StatsListFragment extends Fragment {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                if(statslistList.size() > 0) {
-                    statslistList.remove(statslistList.size() - 1);
-                }
-
                 final String resStr = response.body().string();
                 try {
                     Document doc = Jsoup.parse(resStr);
-                    Elements nodes = doc.select(".std_tb tr");
+                    final Elements nodes = doc.select(".std_tb tr");
 
                     for(Element node: nodes) {
                         if(nodes.indexOf(node) == 0) { continue; }
@@ -190,8 +186,13 @@ public class StatsListFragment extends Fragment {
                     recyclerView.post(new Runnable() {
                         @Override
                         public void run() {
-                            adapter.notifyItemRemoved(statslistList.size());
                             adapter.notifyDataSetChanged();
+
+                            if((statslistList.size() - nodes.size()) > 0) {
+                                statslistList.remove(statslistList.size() - nodes.size());
+                                adapter.notifyItemRemoved(statslistList.size());
+                            }
+
                             setLoaded();
 
                             if (getActivity() != null && getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE) {
