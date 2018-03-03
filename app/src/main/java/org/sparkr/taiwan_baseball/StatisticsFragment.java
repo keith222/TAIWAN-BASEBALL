@@ -124,7 +124,7 @@ public class StatisticsFragment extends Fragment {
                             if (getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE) {
                                 getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
                             }
-                            Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getContext(), "統計資料錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
                     });
                 }
@@ -180,7 +180,7 @@ public class StatisticsFragment extends Fragment {
 
                             Fragment statsListFragment = new StatsListFragment();
                             FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                            transaction.replace(R.id.fragment_statistics, statsListFragment);
+                            transaction.replace(R.id.fragment_statistics, statsListFragment, "StatsListFragment");
                             transaction.addToBackStack(null);
                             transaction.commit();
                         }

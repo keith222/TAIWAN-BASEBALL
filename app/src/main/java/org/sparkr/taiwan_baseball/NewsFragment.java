@@ -137,6 +137,19 @@ public class NewsFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        client.dispatcher().cancelAll();
+        if(newsList.get(newsList.size()-1) == null) {
+            setLoaded();
+            newsList.remove(newsList.size()-1);
+            adapter.notifyItemRemoved(newsList.size());
+        }
+
+    }
+
     public void setLoaded() {
         isLoading = false;
     }
@@ -151,7 +164,7 @@ public class NewsFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getContext(), "新聞資料發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
                     });
                 }

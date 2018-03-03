@@ -1,5 +1,6 @@
 package org.sparkr.taiwan_baseball;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,13 +16,6 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import info.hoang8f.android.segmented.SegmentedGroup;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.sparkr.taiwan_baseball.Model.Game;
@@ -31,6 +25,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import info.hoang8f.android.segmented.SegmentedGroup;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -68,9 +69,6 @@ public class GameFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ((MainActivity)getActivity()).getSupportActionBar().setTitle("賽事資訊");
-        ((MainActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        ((MainActivity)getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
         getActivity().findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
     }
 
@@ -151,11 +149,50 @@ public class GameFragment extends Fragment {
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        Log.d("onAttach", "onAttach");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        Log.d("onResume", "onResume");
+
+        setActionBar();
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        Log.d("setUserVisibleHint", "setUserVisibleHint");
+
+        if (isVisibleToUser) {
+            setActionBar();
+        }
+    }
+
+
+    @Override
     public void onPause() {
         super.onPause();
+
         if(timer != null) {
             timer.cancel();
         }
+
+        client.dispatcher().cancelAll();
+
+        Log.d("onPause", "onPause");
+    }
+
+    private void setActionBar() {
+        ((MainActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((MainActivity)getActivity()).getSupportActionBar().setTitle("賽事資訊");
+        ((MainActivity)getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
 
     public class GameTimerTask extends TimerTask {
@@ -267,7 +304,7 @@ public class GameFragment extends Fragment {
                             @Override
                             public void run() {
                                 getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
-                                Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getContext(), "無比賽資料。", Toast.LENGTH_LONG).show();
                             }
                         });
                     }
@@ -336,7 +373,7 @@ public class GameFragment extends Fragment {
                             @Override
                             public void run() {
                                 getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
-                                Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getContext(), "無比賽資料。", Toast.LENGTH_LONG).show();
                             }
                         });
                     }

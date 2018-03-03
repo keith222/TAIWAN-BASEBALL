@@ -49,7 +49,7 @@ public class VideoFragment extends Fragment {
     private RecyclerView recyclerView;
     private String page = "";
     private int visibleThreshold = 4;
-    private Boolean isLoading;
+    private boolean isLoading;
     int lastVisibleItem, totalItemCount;
 
 
@@ -93,7 +93,7 @@ public class VideoFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            public Boolean isScrolled = false;
+            public boolean isScrolled = false;
 
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -132,6 +132,18 @@ public class VideoFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        client.dispatcher().cancelAll();
+        if(videoList.get(videoList.size()-1) == null) {
+            videoList.remove(videoList.size()-1);
+            adapter.notifyItemRemoved(videoList.size());
+            setLoaded();
+        }
+    }
+
     public void setLoaded() {
         isLoading = false;
     }
@@ -147,7 +159,7 @@ public class VideoFragment extends Fragment {
                         @Override
                         public void run() {
                             getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
-                            Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getContext(), "影片資料發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
                     });
                 }

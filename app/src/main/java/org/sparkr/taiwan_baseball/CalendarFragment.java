@@ -306,7 +306,7 @@ public class CalendarFragment extends Fragment {
 
                     Fragment gameFragment = new GameFragment();
                     FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                    transaction.replace(R.id.fragment_calendar, gameFragment);
+                    transaction.replace(R.id.fragment_calendar, gameFragment, "GameFragment");
                     transaction.addToBackStack(null);
                     transaction.commit();
                 }

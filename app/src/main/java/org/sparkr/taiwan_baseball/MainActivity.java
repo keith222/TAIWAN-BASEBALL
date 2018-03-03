@@ -115,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
+
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
         tabLayout.getTabAt(0).setIcon(iconResId[0]);
@@ -131,6 +132,25 @@ public class MainActivity extends AppCompatActivity {
                 tab.setIcon(selectedIconresId[tab.getPosition()]);
                 getSupportActionBar().setTitle(titleArray[tab.getPosition()]);
                 selectedIndex = tab.getPosition();
+
+
+                if(tab.getPosition() == 2) {
+                    Fragment gameFragment = getSupportFragmentManager().findFragmentByTag("GameFragment");
+                    if(gameFragment != null && gameFragment.isVisible()) {
+                        gameFragment.setUserVisibleHint(true);
+                    }
+                } else if(tab.getPosition() == 3) {
+                    Fragment statsListFragment = getSupportFragmentManager().findFragmentByTag("StatsListFragment");
+                    Fragment playerFragment = getSupportFragmentManager().findFragmentByTag("PlayerFragment");
+
+                    if(statsListFragment != null && statsListFragment.isVisible()) {
+                        statsListFragment.setUserVisibleHint(true);
+                    }
+
+                    if(playerFragment != null && playerFragment.isVisible()) {
+                        playerFragment.setUserVisibleHint(true);
+                    }
+                }
             }
 
             @Override

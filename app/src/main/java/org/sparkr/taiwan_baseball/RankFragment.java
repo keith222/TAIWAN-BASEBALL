@@ -104,7 +104,7 @@ public class RankFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getContext(), "排行資料發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
                     });
                 }

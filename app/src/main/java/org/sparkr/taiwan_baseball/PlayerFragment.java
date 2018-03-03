@@ -57,10 +57,14 @@ public class PlayerFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ((MainActivity)getActivity()).getSupportActionBar().setTitle("選手資訊");
-        ((MainActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        ((MainActivity)getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
         getActivity().findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        setActionBar();
     }
 
     @Override
@@ -71,6 +75,30 @@ public class PlayerFragment extends Fragment {
         fetchPlayer(view);
 
         return view;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        client.dispatcher().cancelAll();
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        Log.d("setUserVisibleHint", "setUserVisibleHint");
+
+        if (isVisibleToUser) {
+            setActionBar();
+        }
+    }
+
+    private void setActionBar() {
+        ((MainActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((MainActivity)getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+        ((MainActivity)getActivity()).getSupportActionBar().setTitle("選手資訊");
     }
 
     private void fetchPlayer(final View view) {
@@ -90,7 +118,7 @@ public class PlayerFragment extends Fragment {
                             if (getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE) {
                                 getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
                             }
-                            Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getContext(), "選手資訊發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
                     });
                 }
