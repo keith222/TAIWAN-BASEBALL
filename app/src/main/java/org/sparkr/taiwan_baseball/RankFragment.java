@@ -100,10 +100,11 @@ public class RankFragment extends Fragment {
         mcall.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                if(getActivity() != null) {
+                if(getContext() != null && getActivity() != null) {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
                             Toast.makeText(getContext(), "排行資料發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
                     });

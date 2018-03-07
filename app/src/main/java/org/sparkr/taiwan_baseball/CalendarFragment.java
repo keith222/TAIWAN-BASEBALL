@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -184,10 +185,8 @@ public class CalendarFragment extends Fragment {
                         ((TextView) getActivity().findViewById(R.id.calendarTextView)).setText(year + "年" + month + "月");
 
                         adapter.notifyDataSetChanged();
+                        getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
 
-                        if (getActivity() != null && getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE && getActivity().findViewById(R.id.gameRecyclerView).getVisibility() == View.VISIBLE) {
-                            getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
-                        }
                     }
                 });
 
@@ -223,6 +222,7 @@ public class CalendarFragment extends Fragment {
                     @Override
                     public void run() {
                         adapter.notifyDataSetChanged();
+                        getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
                     }
                 });
             }
@@ -302,9 +302,7 @@ public class CalendarFragment extends Fragment {
             itemHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((MainActivity)getActivity()).setSendedGame(gameList.get(position));
-
-                    Fragment gameFragment = new GameFragment();
+                    Fragment gameFragment = GameFragment.newInstance(gameList.get(position));
                     FragmentTransaction transaction = getFragmentManager().beginTransaction();
                     transaction.replace(R.id.fragment_calendar, gameFragment, "GameFragment");
                     transaction.addToBackStack(null);

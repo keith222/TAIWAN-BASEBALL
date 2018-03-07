@@ -117,7 +117,7 @@ public class StatisticsFragment extends Fragment {
         mcall.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                if(getActivity() != null) {
+                if(getContext() != null && getActivity() != null) {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -176,10 +176,12 @@ public class StatisticsFragment extends Fragment {
                             moreData.add(((Integer.parseInt(type) == 0)? battingStats:pitchingStats).get(position).getMoreUrl());
                             moreData.add(((Integer.parseInt(type) == 0)? battingStats:pitchingStats).get(position).getCategory());
                             moreData.add(type);
-                            ((MainActivity)getActivity()).setMoreData(moreData);
 
                             Fragment statsListFragment = new StatsListFragment();
                             FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                            Bundle bundle = new Bundle();
+                            bundle.putStringArrayList("moreData", (ArrayList<String>) moreData);
+                            statsListFragment.setArguments(bundle);
                             transaction.replace(R.id.fragment_statistics, statsListFragment, "StatsListFragment");
                             transaction.addToBackStack(null);
                             transaction.commit();

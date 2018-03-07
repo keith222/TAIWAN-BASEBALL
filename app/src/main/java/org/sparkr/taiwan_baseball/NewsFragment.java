@@ -142,7 +142,7 @@ public class NewsFragment extends Fragment {
         super.onPause();
 
         client.dispatcher().cancelAll();
-        if(newsList.get(newsList.size()-1) == null) {
+        if(newsList.size() > 0 && newsList.get(newsList.size()-1) == null) {
             setLoaded();
             newsList.remove(newsList.size()-1);
             adapter.notifyItemRemoved(newsList.size());
@@ -160,10 +160,11 @@ public class NewsFragment extends Fragment {
         mcall.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                if(getActivity() != null) {
+                if(getContext() != null && getActivity() != null) {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
                             Toast.makeText(getContext(), "新聞資料發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
                     });
@@ -194,7 +195,7 @@ public class NewsFragment extends Fragment {
 
                         String newstitle = node.select(".news_row_cont > div > a.news_row_title").text().trim();
                         String tmpeDate = node.select(".news_row_date").text().trim();
-                        String newsDate = tmpeDate;
+                        String newsDate = tmpeDate.substring(0,10);
                         String newsImageUrl = node.select(".news_row_pic > img").attr("src").toString();
                         String newsUrl = node.select(".news_row_cont > div > a").attr("href").toString();
 

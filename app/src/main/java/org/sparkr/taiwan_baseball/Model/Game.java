@@ -1,10 +1,12 @@
 package org.sparkr.taiwan_baseball.Model;
 
+import java.io.Serializable;
+
 /**
  * Created by Keith on 2018/2/3.
  */
 
-public class Game {
+public class Game implements Serializable{
     private int game;
     private String date;
     private String guest;

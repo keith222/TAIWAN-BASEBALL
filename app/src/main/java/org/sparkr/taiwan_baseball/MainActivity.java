@@ -37,8 +37,6 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager mViewPager;
 
     private Game sendedGame;
-    private List<String> moreData;
-    private String[] playerData;
     private String tempTitle = "";
     private int selectedIndex = 0;
 
@@ -59,36 +57,12 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private String[] titleArray = {
-            "聯盟新聞",
+            "職棒新聞",
             "聯盟排名",
-            "賽事日程",
+            "職棒賽程",
             "個人成績",
-            "聯盟影音"
+            "職棒影音"
     };
-
-    public void setSendedGame(Game game) {
-        this.sendedGame = game;
-    }
-
-    public Game getSendedGame() {
-        return this.sendedGame;
-    }
-
-    public void setMoreData(List<String> moreData) {
-        this.moreData = moreData;
-    }
-
-    public List<String> getMoreData() {
-        return this.moreData;
-    }
-
-    public void setPlayerData(String[] playerData) {
-        this.playerData = playerData;
-    }
-
-    public String[] getPlayerData() {
-        return this.playerData;
-    }
 
     public void setTempTitle(String tempTitle) {
         this.tempTitle = tempTitle;
@@ -96,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.AppTheme);
+
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
@@ -114,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-
+//        mViewPager.setOffscreenPageLimit(4);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);

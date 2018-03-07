@@ -39,6 +39,7 @@ public class StatsListFragment extends Fragment {
 
     private OkHttpClient client = new OkHttpClient();
     private List<StatsList> statslistList;
+    private List<String> moreData;
     private RecyclerView recyclerView;
     private StatsListAdapter adapter;
     private int totalPage = 1;
@@ -54,6 +55,10 @@ public class StatsListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if(getArguments() != null) {
+            moreData = getArguments().getStringArrayList("moreData");
+        }
 
         getActivity().findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
 
@@ -149,7 +154,7 @@ public class StatsListFragment extends Fragment {
     private void setActionBar() {
         ((MainActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         ((MainActivity)getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
-        ((MainActivity)getActivity()).getSupportActionBar().setTitle(((MainActivity)getActivity()).getMoreData().get(1));
+        ((MainActivity)getActivity()).getSupportActionBar().setTitle(moreData.get(1));
     }
 
     public void setLoaded() {
@@ -157,15 +162,15 @@ public class StatsListFragment extends Fragment {
     }
 
     public void fetchStatsList(final int newPage) {
-        String route = ((MainActivity)getActivity()).getMoreData().get(0).substring(1);
-        final String category = ((MainActivity)getActivity()).getMoreData().get(1);
+        String route = moreData.get(0).substring(1);
+        final String category = moreData.get(1);
 
         Request request = new Request.Builder().url(this.getString(R.string.CPBLSourceURL) + route + "&per_page=" + Integer.toString(newPage)).build();
         Call mcall = client.newCall(request);
         mcall.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                if(getActivity() != null) {
+                if(getContext() != null && getActivity() != null) {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -206,8 +211,12 @@ public class StatsListFragment extends Fragment {
                         @Override
                         public void onItemClick(int position) {
                             ((MainActivity)getActivity()).setTempTitle(category);
-                            ((MainActivity)getActivity()).setPlayerData(new String[]{statslistList.get(position).getPlayerUrl(), ((MainActivity)getActivity()).getMoreData().get(2)});
+                            String[] playerData = new String[]{statslistList.get(position).getPlayerUrl(), moreData.get(2)};
+
                             Fragment playerFragment = new PlayerFragment();
+                            Bundle bundle = new Bundle();
+                            bundle.putStringArray("playerData", playerData);
+                            playerFragment.setArguments(bundle);
                             FragmentTransaction transaction = getFragmentManager().beginTransaction();
                             transaction.add(R.id.fragment_statslist, playerFragment, "PlayerFragment");
                             transaction.addToBackStack(null);

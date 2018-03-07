@@ -35,6 +35,7 @@ public class PlayerFragment extends Fragment {
 
     private OkHttpClient client = new OkHttpClient();
     private String playerURL;
+    private String[] playerData;
 
     public PlayerFragment() {
         // Required empty public constructor
@@ -56,6 +57,10 @@ public class PlayerFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if(getArguments() != null) {
+            playerData = getArguments().getStringArray("playerData");
+        }
 
         getActivity().findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
     }
@@ -102,16 +107,16 @@ public class PlayerFragment extends Fragment {
     }
 
     private void fetchPlayer(final View view) {
-        ((TextView)view.findViewById(R.id.statsTextView)).setText((((MainActivity)getActivity()).getPlayerData()[1] == "0")?"打擊成績":"投球成績");
+        ((TextView)view.findViewById(R.id.statsTextView)).setText((playerData[1] == "0")?"打擊成績":"投球成績");
 
         final String cssString = "<style>.std_tb{color: #333;font-size: 13px;line-height: 2.2em;}table.std_tb tr{background-color: #f8f8f8;}table.mix_x tr:nth-child(2n+1), table.std_tb tr.change{background-color: #e6e6e6;}table.std_tb th {background-color: #081B2F;color: #fff;font-weight: normal;padding: 0 6px;}table.std_tb td{padding: 0 6px;}table.std_tb th a, table.std_tb th a:link, table.std_tb th a:visited, table.std_tb th a:active {color: #fff;}a, a:link, a:visited, a:active {text-decoration: none;}</style>";
 
-        Request request = new Request.Builder().url(this.getString(R.string.CPBLSourceURL) + ((MainActivity)getActivity()).getPlayerData()[0].substring(1)).build();
+        Request request = new Request.Builder().url(this.getString(R.string.CPBLSourceURL) + playerData[0].substring(1)).build();
         Call mCall = client.newCall(request);
         mCall.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                if(getActivity() != null) {
+                if(getContext() != null && getActivity() != null) {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {

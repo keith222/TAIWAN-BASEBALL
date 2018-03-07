@@ -46,6 +46,7 @@ public class GameFragment extends Fragment {
     private Timer timer;
     private View gameView;
     private Game tempGame;
+    private Game receivedGame;
 
     public GameFragment() {
         // Required empty public constructor
@@ -58,9 +59,10 @@ public class GameFragment extends Fragment {
      * @return A new instance of fragment GameFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static GameFragment newInstance() {
+    public static GameFragment newInstance(Game game) {
         GameFragment fragment = new GameFragment();
         Bundle args = new Bundle();
+        args.putSerializable("gameData", game);
         fragment.setArguments(args);
         return fragment;
     }
@@ -78,7 +80,7 @@ public class GameFragment extends Fragment {
 
         final View view = inflater.inflate(R.layout.fragment_game, container, false);        TextView textView = new TextView(getActivity());
 
-        final Game receivedGame = ((MainActivity)getActivity()).getSendedGame();
+        final Game receivedGame = (Game)getArguments().getSerializable("gameData");
 
         ((TextView) view.findViewById(R.id.gameNumberTextView)).setText(gameString(receivedGame.getGame()));
         ((ImageView) view.findViewById(R.id.guestImageView)).setImageResource(teamImageView(receivedGame.getGuest()));
@@ -259,7 +261,7 @@ public class GameFragment extends Fragment {
         mCall.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                if(getActivity() != null) {
+                if(getContext() != null && getActivity() != null) {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -284,6 +286,7 @@ public class GameFragment extends Fragment {
                     }
 
                     final String scoreBoard = doc.select(".score_board").toString();
+
                     if(!scoreBoard.isEmpty()) {
                         final String boardCss = "<style>table{width:100%;}.score_board{background-color: #081B2F;overflow:hidden;}.gap_l20{margin-left:10px;}.score_board_side,.score_board_main{float:left;}table.score_table th{color:#b2b1b1}table.score_table th, table.score_table td{height:34px;padding:0 3px;}table.score_table tr:nth-child(2) td{border-bottom:1px solid #0d0d0d;}table.score_table td{color:#fff;}table.score_table td span {margin: 0 2px;padding: 1px 3px;width: 20px;}table.score_table tr:nth-child(3) td {border-top: 1px solid #575757;}</style>";
 
@@ -317,14 +320,14 @@ public class GameFragment extends Fragment {
         mCall.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                if(getActivity() != null) {
+                if(getContext() != null && getActivity() != null) {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE) {
+                            if(getContext() != null) {
                                 getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                                Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                             }
-                            Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
                     });
                 }
