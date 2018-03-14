@@ -1,5 +1,6 @@
 package org.sparkr.taiwan_baseball;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -68,7 +69,9 @@ public class CalendarFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getActivity().findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+        if(!((MainActivity)getActivity()).isShowingProgressDialog()) {
+            ((MainActivity)getActivity()).showProgressDialog();
+        }
 
         adapter = new SectionedRecyclerViewAdapter();
 
@@ -133,8 +136,8 @@ public class CalendarFragment extends Fragment {
             ((TextView) getActivity().findViewById(R.id.calendarTextView)).setText(year + "年" + month + "月");
         }
 
-        if(getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.GONE) {
-            getActivity().findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+        if(!((MainActivity)getActivity()).isShowingProgressDialog()) {
+            ((MainActivity)getActivity()).showProgressDialog();
         }
 
         adapter.removeAllSections();
@@ -153,9 +156,7 @@ public class CalendarFragment extends Fragment {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                if (getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE && getActivity().findViewById(R.id.gameRecyclerView).getVisibility() == View.VISIBLE) {
-                                    getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
-                                }
+                                ((MainActivity)getActivity()).hideProgressDialog();
                                 Toast.makeText(getContext(), "未有比賽資料。", Toast.LENGTH_LONG).show();
                             }
                         });
@@ -185,7 +186,7 @@ public class CalendarFragment extends Fragment {
                         ((TextView) getActivity().findViewById(R.id.calendarTextView)).setText(year + "年" + month + "月");
 
                         adapter.notifyDataSetChanged();
-                        getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                        ((MainActivity)getActivity()).hideProgressDialog();
 
                     }
                 });
@@ -222,7 +223,7 @@ public class CalendarFragment extends Fragment {
                     @Override
                     public void run() {
                         adapter.notifyDataSetChanged();
-                        getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                        ((MainActivity)getActivity()).hideProgressDialog();
                     }
                 });
             }

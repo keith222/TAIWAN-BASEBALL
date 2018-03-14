@@ -66,7 +66,9 @@ public class RankFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getActivity().findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+        if(!((MainActivity)getActivity()).isShowingProgressDialog()) {
+            ((MainActivity)getActivity()).showProgressDialog();
+        }
 
         adapter = new SectionedRecyclerViewAdapter();
 
@@ -104,7 +106,7 @@ public class RankFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                            ((MainActivity)getActivity()).hideProgressDialog();
                             Toast.makeText(getContext(), "排行資料發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
                     });

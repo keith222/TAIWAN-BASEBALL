@@ -1,5 +1,6 @@
 package org.sparkr.taiwan_baseball;
 
+import android.app.ProgressDialog;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -30,13 +31,12 @@ public class MainActivity extends AppCompatActivity {
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
-
+    private ProgressDialog progressDialog;
     /**
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
 
-    private Game sendedGame;
     private String tempTitle = "";
     private int selectedIndex = 0;
 
@@ -75,10 +75,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
-
-        View loadingView = findViewById(R.id.loadingPanel);
-        loadingView.setVisibility(View.GONE);
-        loadingView.setClickable(false);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -138,11 +134,25 @@ public class MainActivity extends AppCompatActivity {
             public void onTabReselected(TabLayout.Tab tab) {}
         });
 
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Loading...");
+    }
+
+    public void showProgressDialog() {
+        progressDialog.show();
+    }
+
+    public void hideProgressDialog() {
+        progressDialog.dismiss();
+    }
+
+    public boolean isShowingProgressDialog() {
+        return progressDialog.isShowing();
     }
 
     @Override
     public void onBackPressed() {
-        findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+        progressDialog.dismiss();
 
         FragmentManager fm = this.getSupportFragmentManager();
 

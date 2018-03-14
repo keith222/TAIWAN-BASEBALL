@@ -4,6 +4,7 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/CPBLBlue</item>
         <item name="colorPrimaryDark">@color/lighterCPBLBlue</item>
+        <item name="colorAccent">@color/lighterCPBLBlue</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>

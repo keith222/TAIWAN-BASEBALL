@@ -68,7 +68,9 @@ public class StatisticsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getActivity().findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+        if(!((MainActivity)getActivity()).isShowingProgressDialog()) {
+            ((MainActivity) getActivity()).showProgressDialog();
+        }
 
         battingStats = new ArrayList<>();
         pitchingStats = new ArrayList<>();
@@ -121,9 +123,7 @@ public class StatisticsFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE) {
-                                getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
-                            }
+                            ((MainActivity)getActivity()).hideProgressDialog();
                             Toast.makeText(getContext(), "統計資料錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
                     });
@@ -193,8 +193,8 @@ public class StatisticsFragment extends Fragment {
                         public void run() {
                             adapter.notifyDataSetChanged();
 
-                            if (getActivity() != null && getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE) {
-                                getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                            if (getActivity() != null) {
+                                ((MainActivity)getActivity()).hideProgressDialog();
                             }
                         }
                     });

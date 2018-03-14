@@ -79,7 +79,7 @@ public class NewsFragment extends Fragment {
         newsList = new ArrayList<>();
         adapter = new NewsAdapter(newsList);
 
-        getActivity().findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+        ((MainActivity)getActivity()).showProgressDialog();
 
         fetchNews(page);
 
@@ -164,7 +164,7 @@ public class NewsFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                            ((MainActivity)getActivity()).hideProgressDialog();
                             Toast.makeText(getContext(), "新聞資料發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
                     });
@@ -224,9 +224,7 @@ public class NewsFragment extends Fragment {
 
                             setLoaded();
 
-                            if (getActivity() != null && getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE) {
-                                getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
-                            }
+                            ((MainActivity)getActivity()).hideProgressDialog();
                         }
                     });
 

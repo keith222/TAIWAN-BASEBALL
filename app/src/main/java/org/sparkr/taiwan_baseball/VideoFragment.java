@@ -74,7 +74,9 @@ public class VideoFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getActivity().findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+        if(!((MainActivity)getActivity()).isShowingProgressDialog()) {
+            ((MainActivity) getActivity()).showProgressDialog();
+        }
 
         videoList = new ArrayList<Video.VideoItem>();
         adapter = new VideoAdapter(videoList);
@@ -158,7 +160,7 @@ public class VideoFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                            ((MainActivity)getActivity()).hideProgressDialog();
                             Toast.makeText(getContext(), "影片資料發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
                     });
@@ -201,8 +203,8 @@ public class VideoFragment extends Fragment {
 
                             setLoaded();
 
-                            if (getActivity() != null && getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE) {
-                                getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                            if (getActivity() != null) {
+                                ((MainActivity)getActivity()).hideProgressDialog();
                             }
                         }
                     });

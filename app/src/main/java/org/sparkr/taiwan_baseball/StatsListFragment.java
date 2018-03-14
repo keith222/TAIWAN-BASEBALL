@@ -60,7 +60,9 @@ public class StatsListFragment extends Fragment {
             moreData = getArguments().getStringArrayList("moreData");
         }
 
-        getActivity().findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+        if(!((MainActivity)getActivity()).isShowingProgressDialog()) {
+            ((MainActivity) getActivity()).showProgressDialog();
+        }
 
         statslistList = new ArrayList<>();
         adapter = new StatsListAdapter(statslistList);
@@ -174,9 +176,7 @@ public class StatsListFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE) {
-                                getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
-                            }
+                            ((MainActivity)getActivity()).hideProgressDialog();
                             Toast.makeText(getContext(), "統計資料發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
                     });
@@ -236,8 +236,8 @@ public class StatsListFragment extends Fragment {
 
                             setLoaded();
 
-                            if (getActivity() != null && getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE) {
-                                getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                            if (getActivity() != null) {
+                                ((MainActivity)getActivity()).hideProgressDialog();
                             }
                         }
                     });

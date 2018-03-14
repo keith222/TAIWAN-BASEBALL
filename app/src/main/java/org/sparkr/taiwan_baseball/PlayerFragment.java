@@ -62,7 +62,9 @@ public class PlayerFragment extends Fragment {
             playerData = getArguments().getStringArray("playerData");
         }
 
-        getActivity().findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+        if(!((MainActivity)getActivity()).isShowingProgressDialog()) {
+            ((MainActivity)getActivity()).showProgressDialog();
+        }
     }
 
     @Override
@@ -120,9 +122,7 @@ public class PlayerFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (getActivity().findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE) {
-                                getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
-                            }
+                            ((MainActivity)getActivity()).hideProgressDialog();
                             Toast.makeText(getContext(), "選手資訊發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
                     });
@@ -185,7 +185,7 @@ public class PlayerFragment extends Fragment {
                                 ((TextView)view.findViewById(R.id.nameTextView)).setText(playerInfo);
                                 ((TextView)view.findViewById(R.id.dataTextView)).setText(infoString);
 
-                                getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                                ((MainActivity)getActivity()).hideProgressDialog();
                             }
                         });
                     }
@@ -196,7 +196,7 @@ public class PlayerFragment extends Fragment {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                getActivity().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                                ((MainActivity)getActivity()).hideProgressDialog();
                                 Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                             }
                         });
