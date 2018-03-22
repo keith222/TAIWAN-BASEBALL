@@ -163,8 +163,6 @@ public class GameFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        Log.d("onResume", "onResume");
-
         setActionBar();
     }
 
