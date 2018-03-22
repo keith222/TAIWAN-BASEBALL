@@ -69,7 +69,7 @@ public class CalendarFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(!((MainActivity)getActivity()).isShowingProgressDialog()) {
+        if(!((MainActivity)getActivity()).isShowingProgressDialog() && getActivity() != null) {
             ((MainActivity)getActivity()).showProgressDialog();
         }
 
@@ -143,7 +143,7 @@ public class CalendarFragment extends Fragment {
             ((TextView) getActivity().findViewById(R.id.calendarTextView)).setText(year + "年" + month + "月");
         }
 
-        if(!((MainActivity)getActivity()).isShowingProgressDialog()) {
+        if(!((MainActivity)getActivity()).isShowingProgressDialog() && getActivity() != null) {
             ((MainActivity)getActivity()).showProgressDialog();
         }
 

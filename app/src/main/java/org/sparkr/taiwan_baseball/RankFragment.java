@@ -67,7 +67,7 @@ public class RankFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(!((MainActivity)getActivity()).isShowingProgressDialog()) {
+        if(!((MainActivity)getActivity()).isShowingProgressDialog() && getActivity() != null) {
             ((MainActivity)getActivity()).showProgressDialog();
         }
 

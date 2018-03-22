@@ -62,7 +62,7 @@ public class PlayerFragment extends Fragment {
             playerData = getArguments().getStringArray("playerData");
         }
 
-        if(!((MainActivity)getActivity()).isShowingProgressDialog()) {
+        if(!((MainActivity)getActivity()).isShowingProgressDialog() && getActivity() != null) {
             ((MainActivity)getActivity()).showProgressDialog();
         }
     }
