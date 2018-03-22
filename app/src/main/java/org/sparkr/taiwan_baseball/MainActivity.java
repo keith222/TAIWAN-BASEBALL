@@ -10,14 +10,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 
 import com.crashlytics.android.Crashlytics;
 import io.fabric.sdk.android.Fabric;
-import org.sparkr.taiwan_baseball.Model.Game;
-
-import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -135,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         progressDialog = new ProgressDialog(this);
+        progressDialog.setCancelable(false);
         progressDialog.setMessage("Loading...");
     }
 
