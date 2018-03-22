@@ -90,6 +90,13 @@ public class CalendarFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        ((TextView) getView().findViewById(R.id.calendarTextView)).setText(year + "年" + month + "月");
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
