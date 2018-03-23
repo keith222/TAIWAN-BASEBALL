@@ -69,10 +69,6 @@ public class CalendarFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(!((MainActivity)getActivity()).isShowingProgressDialog() && getActivity() != null) {
-            ((MainActivity)getActivity()).showProgressDialog();
-        }
-
         adapter = new SectionedRecyclerViewAdapter();
 
         year = Calendar.getInstance().get(Calendar.YEAR);
@@ -312,7 +308,7 @@ public class CalendarFragment extends Fragment {
                 public void onClick(View v) {
                     Fragment gameFragment = GameFragment.newInstance(gameList.get(position));
                     FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                    transaction.replace(R.id.fragment_calendar, gameFragment, "GameFragment");
+                    transaction.add(R.id.fragment_calendar_container, gameFragment, "GameFragment");
                     transaction.addToBackStack(null);
                     transaction.commit();
                 }

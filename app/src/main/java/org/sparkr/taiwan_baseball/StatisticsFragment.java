@@ -68,7 +68,7 @@ public class StatisticsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(getActivity() != null) {
+        if(!((MainActivity)getActivity()).isShowingProgressDialog() && getActivity() != null) {
             ((MainActivity) getActivity()).showProgressDialog();
         }
 

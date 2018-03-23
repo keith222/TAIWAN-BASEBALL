@@ -79,7 +79,9 @@ public class NewsFragment extends Fragment {
         newsList = new ArrayList<>();
         adapter = new NewsAdapter(newsList);
 
-        ((MainActivity)getActivity()).showProgressDialog();
+        if(getActivity() != null) {
+            ((MainActivity)getActivity()).showProgressDialog();
+        }
 
         fetchNews(page);
 

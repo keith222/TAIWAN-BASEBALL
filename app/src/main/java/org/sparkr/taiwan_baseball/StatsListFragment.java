@@ -60,7 +60,7 @@ public class StatsListFragment extends Fragment {
             moreData = getArguments().getStringArrayList("moreData");
         }
 
-        if(getActivity() != null) {
+        if(!((MainActivity)getActivity()).isShowingProgressDialog() && getActivity() != null) {
             ((MainActivity) getActivity()).showProgressDialog();
         }
 
