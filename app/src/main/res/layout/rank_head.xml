@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="70dp"
+    android:layout_height="wrap_content"
+    android:minHeight="70dp"
     android:background="@color/CPBLBlue">
 
     <TextView
@@ -22,6 +23,7 @@
         android:layout_below="@+id/rankSeasonTextView"
         android:layout_marginTop="8sp"
         android:layout_marginLeft="10sp"
+        android:layout_marginBottom="3sp"
         android:textSize="17sp"
         android:textColor="@color/white"
         android:text="隊名" android:layout_marginStart="10sp"/>

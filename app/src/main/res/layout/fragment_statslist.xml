@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/fragment_statslist"
+    android:id="@+id/fragment_statslist_container"
     tools:context="org.sparkr.taiwan_baseball.StatsListFragment">
 
     <!-- TODO: Update blank fragment layout -->
