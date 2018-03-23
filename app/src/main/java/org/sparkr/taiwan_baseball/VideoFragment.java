@@ -74,7 +74,7 @@ public class VideoFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(!((MainActivity)getActivity()).isShowingProgressDialog() && getActivity() != null) {
+        if(getActivity() != null) {
             ((MainActivity) getActivity()).showProgressDialog();
         }
 
@@ -139,7 +139,7 @@ public class VideoFragment extends Fragment {
         super.onPause();
 
         client.dispatcher().cancelAll();
-        if(videoList.get(videoList.size()-1) == null) {
+        if(!videoList.isEmpty() && videoList.get(videoList.size()-1) == null) {
             videoList.remove(videoList.size()-1);
             adapter.notifyItemRemoved(videoList.size());
             setLoaded();
