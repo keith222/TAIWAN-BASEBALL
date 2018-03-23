@@ -60,7 +60,7 @@ public class StatsListFragment extends Fragment {
             moreData = getArguments().getStringArrayList("moreData");
         }
 
-        if(!((MainActivity)getActivity()).isShowingProgressDialog() && getActivity() != null) {
+        if(getActivity() != null) {
             ((MainActivity) getActivity()).showProgressDialog();
         }
 
@@ -135,7 +135,7 @@ public class StatsListFragment extends Fragment {
         super.onPause();
 
         client.dispatcher().cancelAll();
-        if(statslistList.get(statslistList.size()-1) == null) {
+        if(!statslistList.isEmpty() && statslistList.get(statslistList.size()-1) == null) {
             statslistList.remove(statslistList.size()-1);
             adapter.notifyItemRemoved(statslistList.size());
             setLoaded();
@@ -218,7 +218,7 @@ public class StatsListFragment extends Fragment {
                             bundle.putStringArray("playerData", playerData);
                             playerFragment.setArguments(bundle);
                             FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                            transaction.add(R.id.fragment_statslist, playerFragment, "PlayerFragment");
+                            transaction.add(R.id.fragment_statslist_container, playerFragment, "PlayerFragment");
                             transaction.addToBackStack(null);
                             transaction.commit();
                         }

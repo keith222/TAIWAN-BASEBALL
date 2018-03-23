@@ -68,7 +68,7 @@ public class StatisticsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(!((MainActivity)getActivity()).isShowingProgressDialog() && getActivity() != null) {
+        if(getActivity() != null) {
             ((MainActivity) getActivity()).showProgressDialog();
         }
 
@@ -182,7 +182,7 @@ public class StatisticsFragment extends Fragment {
                             Bundle bundle = new Bundle();
                             bundle.putStringArrayList("moreData", (ArrayList<String>) moreData);
                             statsListFragment.setArguments(bundle);
-                            transaction.replace(R.id.fragment_statistics, statsListFragment, "StatsListFragment");
+                            transaction.replace(R.id.fragment_statistics_container, statsListFragment, "StatsListFragment");
                             transaction.addToBackStack(null);
                             transaction.commit();
                         }
