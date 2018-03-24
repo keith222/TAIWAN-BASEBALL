@@ -162,7 +162,7 @@ public class NewsFragment extends Fragment {
         mcall.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                if(getContext() != null && getActivity() != null) {
+                if(getContext() != null && ((MainActivity)getActivity()) != null) {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {

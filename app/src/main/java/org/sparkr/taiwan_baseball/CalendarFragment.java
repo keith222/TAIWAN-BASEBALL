@@ -199,8 +199,9 @@ public class CalendarFragment extends Fragment {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                Log.d("onCalnelled","OnCancell");
             }
+
         });
 
         dataReference.addChildEventListener(new ChildEventListener() {
@@ -211,6 +212,20 @@ public class CalendarFragment extends Fragment {
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                if(dataSnapshot.getChildrenCount() < 1) {
+                    if(getActivity() != null) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                ((MainActivity)getActivity()).hideProgressDialog();
+                                Toast.makeText(getContext(), "未有比賽資料。", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+
+                    return;
+                }
+
                 List<Game> gameList = new ArrayList<>();
                 for(int i=0; i<dataSnapshot.getChildrenCount(); i++) {
                     Game game = dataSnapshot.child(Integer.toString(i)).getValue(Game.class);
@@ -243,7 +258,7 @@ public class CalendarFragment extends Fragment {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                Log.d("onCalnelled","OnCancell2");
             }
         });
 

@@ -60,6 +60,10 @@ public class MainActivity extends AppCompatActivity {
             "職棒影音"
     };
 
+    public int getSelectedIndex() {
+        return selectedIndex;
+    }
+
     public void setTempTitle(String tempTitle) {
         this.tempTitle = tempTitle;
     }
@@ -100,7 +104,6 @@ public class MainActivity extends AppCompatActivity {
                 tab.setIcon(selectedIconresId[tab.getPosition()]);
                 getSupportActionBar().setTitle(titleArray[tab.getPosition()]);
                 selectedIndex = tab.getPosition();
-
 
                 if(tab.getPosition() == 2) {
                     Fragment gameFragment = getSupportFragmentManager().findFragmentByTag("GameFragment");

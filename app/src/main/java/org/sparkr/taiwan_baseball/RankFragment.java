@@ -1,7 +1,6 @@
 package org.sparkr.taiwan_baseball;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -74,7 +73,7 @@ public class RankFragment extends Fragment {
         adapter = new SectionedRecyclerViewAdapter();
 
         int year = Calendar.getInstance().get(Calendar.YEAR);
-        int month = Calendar.getInstance().get(Calendar.MONTH);
+        int month = Calendar.getInstance().get(Calendar.MONTH) + 1;
         if(month < 3) {
             year--;
         }
@@ -158,6 +157,10 @@ public class RankFragment extends Fragment {
                         @Override
                         public void run() {
                             adapter.notifyDataSetChanged();
+                            if(getActivity() != null && ((MainActivity)getActivity()).getSelectedIndex() != 0) {
+                                ((MainActivity) getActivity()).hideProgressDialog();
+                            }
+
                         }
                     });
 

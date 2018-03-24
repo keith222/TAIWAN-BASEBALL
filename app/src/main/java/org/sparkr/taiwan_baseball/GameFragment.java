@@ -353,7 +353,7 @@ public class GameFragment extends Fragment {
                     boxHtmlString += doc.select(".half_block.left > table").get(1).toString();
                     boxHtmlString += "<p></p>";
                     boxHtmlString += doc.select(".half_block.right > table").get(1).toString();
-                    boxHtmlString += "<h3 style='color:#081B2F;margin:20px 0 10px 10px;'>賽後簡報成績</h3>";
+                    boxHtmlString += "<h3 style='color:#081B2F;margin:20px 0 10px 10px;'>賽後簡報</h3>";
                     boxHtmlString += doc.select(".half_block.right > p.box_note").get(2).toString();
 
                     if(getActivity() != null) {
