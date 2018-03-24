@@ -27,7 +27,10 @@ import org.sparkr.taiwan_baseball.Model.Game;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionParameters;
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
@@ -147,7 +150,7 @@ public class CalendarFragment extends Fragment {
         adapter.notifyDataSetChanged();
 
         tempList = new ArrayList<>();
-
+        final Map<String , List<Game>> tempMap = new TreeMap<>();
 
         final DatabaseReference dataReference = FirebaseDatabase.getInstance().getReference().getRef().child(year).child(month);
 
@@ -175,7 +178,8 @@ public class CalendarFragment extends Fragment {
                         Game game = snapshot.child(Integer.toString(i)).getValue(Game.class);
                         gameList.add(game);
                     }
-                    tempList.add(gameList);
+//                    tempList.add(gameList);
+                    tempMap.put(dataSnapshot.getKey(), gameList);
                     Calendar calendar = Calendar.getInstance();
                     calendar.set(Integer.parseInt(year), (Integer.parseInt(month) - 1), Integer.parseInt(snapshot.getKey()));;
                     int weekDay = calendar.get(Calendar.DAY_OF_WEEK);
@@ -199,7 +203,6 @@ public class CalendarFragment extends Fragment {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.d("onCalnelled","OnCancell");
             }
 
         });
@@ -232,7 +235,14 @@ public class CalendarFragment extends Fragment {
                     gameList.add(game);
                 }
 
-                int index = tempList.indexOf(gameList);
+                int index = 0;
+                for(int i = 0; i < tempMap.size(); i++) {
+                    if(tempMap.keySet().toArray()[i] == dataSnapshot.getKey()){
+                        break;
+                    }
+                    index++;
+                }
+
                 GameSection section = (GameSection) adapter.getSectionForPosition(index);
                 section.removeAllItem();
                 section.addItem(gameList);
@@ -258,7 +268,6 @@ public class CalendarFragment extends Fragment {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.d("onCalnelled","OnCancell2");
             }
         });
 

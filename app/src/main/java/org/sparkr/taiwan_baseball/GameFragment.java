@@ -90,6 +90,8 @@ public class GameFragment extends Fragment {
         ((TextView) view.findViewById(R.id.homeScoreTextView)).setText((receivedGame.getH_score().isEmpty())?"--":receivedGame.getH_score());
         ((ImageView) view.findViewById(R.id.homeImageView)).setImageResource(teamImageView(receivedGame.getHome()));
         ((TextView) view.findViewById(R.id.placeTextView)).setText(receivedGame.getPlace());
+        ((WebView) view.findViewById(R.id.boxWebView)).setVisibility(View.VISIBLE);
+        ((WebView) view.findViewById(R.id.gameWebView)).setVisibility(View.GONE);
 
         ((ImageView) view.findViewById(R.id.streamImageView)).setOnClickListener(new View.OnClickListener(){
             @Override
@@ -111,8 +113,8 @@ public class GameFragment extends Fragment {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                ((WebView) view.findViewById(R.id.gameWebView)).loadData(boxHtmlString, "text/html; charset=utf-8", "UTF-8");
-                                ((WebView) view.findViewById(R.id.gameWebView)).invalidate();
+                                ((WebView) view.findViewById(R.id.gameWebView)).setVisibility(View.GONE);
+                                ((WebView) view.findViewById(R.id.boxWebView)).setVisibility(View.VISIBLE);
                             }
                         });
 
@@ -121,8 +123,8 @@ public class GameFragment extends Fragment {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                ((WebView) view.findViewById(R.id.gameWebView)).loadData(gameHtmlString, "text/html; charset=utf-8", "UTF-8");
-                                ((WebView) view.findViewById(R.id.gameWebView)).invalidate();
+                                ((WebView) view.findViewById(R.id.gameWebView)).setVisibility(View.VISIBLE);
+                                ((WebView) view.findViewById(R.id.boxWebView)).setVisibility(View.GONE);
                             }
                         });
 
@@ -295,6 +297,9 @@ public class GameFragment extends Fragment {
                                 @Override
                                 public void run() {
                                     ((WebView) view.findViewById(R.id.scoreWebView)).loadData(boardCss + scoreBoard, "text/html; charset=utf-8", "UTF-8");
+                                    ((WebView) view.findViewById(R.id.scoreWebView)).reload();
+                                    ((WebView) view.findViewById(R.id.gameWebView)).loadData(gameHtmlString, "text/html; charset=utf-8", "UTF-8");
+                                    ((WebView) view.findViewById(R.id.gameWebView)).reload();
                                 }
                             });
                         }
@@ -360,9 +365,9 @@ public class GameFragment extends Fragment {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                ((WebView) view.findViewById(R.id.gameWebView)).loadData(boxHtmlString, "text/html; charset=utf-8", "UTF-8");
+                                ((WebView) view.findViewById(R.id.boxWebView)).loadData(boxHtmlString, "text/html; charset=utf-8", "UTF-8");
+                                ((WebView) view.findViewById(R.id.boxWebView)).reload();
                                 ((MainActivity)getActivity()).hideProgressDialog();
-
                             }
                         });
                     }

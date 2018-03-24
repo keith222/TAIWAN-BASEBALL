@@ -22,8 +22,8 @@ android {
         applicationId "org.sparkr.taiwan_baseball"
         minSdkVersion 15
         targetSdkVersion 27
-        versionCode 5
-        versionName "1.0.4"
+        versionCode 6
+        versionName "1.0.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -52,7 +52,7 @@ dependencies {
     compile 'info.hoang8f:android-segmented:1.0.6'
     testCompile 'junit:junit:4.12'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile('com.crashlytics.sdk.android:crashlytics:2.9.0@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.9.1@aar') {
         transitive = true;
     }
     compile('com.crashlytics.sdk.android:answers:1.4.1@aar') {

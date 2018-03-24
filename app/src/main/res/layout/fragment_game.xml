@@ -153,7 +153,19 @@
                 android:layout_marginLeft="-10sp"
                 android:layout_marginRight="-10sp"
                 android:layout_marginTop="-10sp"
-                android:background="@color/white" />
+                android:background="@color/white" >
+
+            </WebView>
+
+            <WebView
+                android:id="@+id/boxWebView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="-10sp"
+                android:layout_marginRight="-10sp"
+                android:layout_marginTop="-10sp"
+                android:background="@color/white" >
+            </WebView>
 
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
