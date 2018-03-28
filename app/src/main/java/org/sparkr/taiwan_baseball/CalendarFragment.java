@@ -142,7 +142,7 @@ public class CalendarFragment extends Fragment {
             ((TextView) getActivity().findViewById(R.id.calendarTextView)).setText(year + "年" + month + "月");
         }
 
-        if(!((MainActivity)getActivity()).isShowingProgressDialog() && getActivity() != null) {
+        if(getActivity() != null && !((MainActivity)getContext()).isFinishing() && !((MainActivity)getActivity()).isShowingProgressDialog()) {
             ((MainActivity)getActivity()).showProgressDialog();
         }
 
@@ -162,7 +162,9 @@ public class CalendarFragment extends Fragment {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                ((MainActivity)getActivity()).hideProgressDialog();
+                                if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
+                                    ((MainActivity) getActivity()).hideProgressDialog();
+                                }
                                 Toast.makeText(getContext(), "未有比賽資料。", Toast.LENGTH_LONG).show();
                             }
                         });
@@ -178,7 +180,7 @@ public class CalendarFragment extends Fragment {
                         Game game = snapshot.child(Integer.toString(i)).getValue(Game.class);
                         gameList.add(game);
                     }
-//                    tempList.add(gameList);
+
                     tempMap.put(dataSnapshot.getKey(), gameList);
                     Calendar calendar = Calendar.getInstance();
                     calendar.set(Integer.parseInt(year), (Integer.parseInt(month) - 1), Integer.parseInt(snapshot.getKey()));;
@@ -220,7 +222,9 @@ public class CalendarFragment extends Fragment {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                ((MainActivity)getActivity()).hideProgressDialog();
+                                if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
+                                    ((MainActivity) getActivity()).hideProgressDialog();
+                                }
                                 Toast.makeText(getContext(), "未有比賽資料。", Toast.LENGTH_LONG).show();
                             }
                         });

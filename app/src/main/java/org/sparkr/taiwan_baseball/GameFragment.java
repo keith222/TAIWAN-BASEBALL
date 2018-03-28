@@ -71,7 +71,7 @@ public class GameFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(!((MainActivity)getActivity()).isShowingProgressDialog() && getActivity() != null) {
+        if(getActivity() != null && !((MainActivity)getContext()).isFinishing() && !((MainActivity)getActivity()).isShowingProgressDialog()) {
             ((MainActivity)getActivity()).showProgressDialog();
         }
     }
@@ -267,7 +267,9 @@ public class GameFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            ((MainActivity)getActivity()).hideProgressDialog();
+                            if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
+                                ((MainActivity) getActivity()).hideProgressDialog();
+                            }
                             Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
                     });
@@ -311,7 +313,9 @@ public class GameFragment extends Fragment {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                ((MainActivity)getActivity()).hideProgressDialog();
+                                if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
+                                    ((MainActivity) getActivity()).hideProgressDialog();
+                                }
                                 Toast.makeText(getContext(), "無比賽資料。", Toast.LENGTH_LONG).show();
                             }
                         });
@@ -329,7 +333,7 @@ public class GameFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if(getContext() != null) {
+                            if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
                                 ((MainActivity)getActivity()).hideProgressDialog();
                                 Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                             }
@@ -367,7 +371,9 @@ public class GameFragment extends Fragment {
                             public void run() {
                                 ((WebView) view.findViewById(R.id.boxWebView)).loadData(boxHtmlString, "text/html; charset=utf-8", "UTF-8");
                                 ((WebView) view.findViewById(R.id.boxWebView)).reload();
-                                ((MainActivity)getActivity()).hideProgressDialog();
+                                if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
+                                    ((MainActivity) getActivity()).hideProgressDialog();
+                                }
                             }
                         });
                     }
@@ -378,7 +384,9 @@ public class GameFragment extends Fragment {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                ((MainActivity)getActivity()).hideProgressDialog();
+                                if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
+                                    ((MainActivity) getActivity()).hideProgressDialog();
+                                }
                                 Toast.makeText(getContext(), "無比賽資料。", Toast.LENGTH_LONG).show();
                             }
                         });

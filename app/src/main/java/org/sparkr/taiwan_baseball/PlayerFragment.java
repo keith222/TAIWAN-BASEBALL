@@ -62,7 +62,7 @@ public class PlayerFragment extends Fragment {
             playerData = getArguments().getStringArray("playerData");
         }
 
-        if(!((MainActivity)getActivity()).isShowingProgressDialog() && getActivity() != null) {
+        if(getActivity() != null && !((MainActivity)getContext()).isFinishing() && !((MainActivity)getActivity()).isShowingProgressDialog()) {
             ((MainActivity)getActivity()).showProgressDialog();
         }
     }
@@ -122,7 +122,9 @@ public class PlayerFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            ((MainActivity)getActivity()).hideProgressDialog();
+                            if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
+                                ((MainActivity) getActivity()).hideProgressDialog();
+                            }
                             Toast.makeText(getContext(), "選手資訊發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
                     });
@@ -196,7 +198,9 @@ public class PlayerFragment extends Fragment {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                ((MainActivity)getActivity()).hideProgressDialog();
+                                if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
+                                    ((MainActivity) getActivity()).hideProgressDialog();
+                                }
                                 Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                             }
                         });

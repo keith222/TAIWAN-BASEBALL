@@ -79,7 +79,7 @@ public class NewsFragment extends Fragment {
         newsList = new ArrayList<>();
         adapter = new NewsAdapter(newsList);
 
-        if(getActivity() != null) {
+        if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
             ((MainActivity)getActivity()).showProgressDialog();
         }
 
@@ -162,11 +162,13 @@ public class NewsFragment extends Fragment {
         mcall.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                if(getContext() != null && ((MainActivity)getActivity()) != null) {
+                if(getContext() != null && getActivity() != null) {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            ((MainActivity)getActivity()).hideProgressDialog();
+                            if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
+                                ((MainActivity) getActivity()).hideProgressDialog();
+                            }
                             Toast.makeText(getContext(), "新聞資料發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
                     });

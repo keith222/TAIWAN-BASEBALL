@@ -68,7 +68,7 @@ public class StatisticsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(!((MainActivity)getActivity()).isShowingProgressDialog() && getActivity() != null) {
+        if(getActivity() != null && !((MainActivity)getContext()).isFinishing() && !((MainActivity)getActivity()).isShowingProgressDialog()) {
             ((MainActivity) getActivity()).showProgressDialog();
         }
 
@@ -123,7 +123,9 @@ public class StatisticsFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            ((MainActivity)getActivity()).hideProgressDialog();
+                            if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
+                                ((MainActivity) getActivity()).hideProgressDialog();
+                            }
                             Toast.makeText(getContext(), "統計資料錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
                     });
@@ -193,7 +195,7 @@ public class StatisticsFragment extends Fragment {
                         public void run() {
                             adapter.notifyDataSetChanged();
 
-                            if (getActivity() != null) {
+                            if (getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
                                 ((MainActivity)getActivity()).hideProgressDialog();
                             }
                         }

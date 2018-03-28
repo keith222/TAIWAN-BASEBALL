@@ -66,7 +66,7 @@ public class RankFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(!((MainActivity)getActivity()).isShowingProgressDialog() && getActivity() != null) {
+        if(getActivity() != null && !((MainActivity)getContext()).isFinishing() && !((MainActivity)getActivity()).isShowingProgressDialog()) {
             ((MainActivity)getActivity()).showProgressDialog();
         }
 
@@ -106,7 +106,9 @@ public class RankFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            ((MainActivity)getActivity()).hideProgressDialog();
+                            if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
+                                ((MainActivity) getActivity()).hideProgressDialog();
+                            }
                             Toast.makeText(getContext(), "排行資料發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
                     });
@@ -143,15 +145,19 @@ public class RankFragment extends Fragment {
 
                     }
 
-                    if(rank.size() >= 4) {
+                    if(rank.size() == 12) {
+                        adapter.addSection(new RankSection("上半季", rank.subList(0,4)));
+                        adapter.addSection(new RankSection("下半季", rank.subList(4,8)));
+                        adapter.addSection(new RankSection("全年度", rank.subList(8,12)));
+
+                    } else if(rank.size() == 8) {
+                        adapter.addSection(new RankSection("上半季", rank.subList(0,4)));
+                        adapter.addSection(new RankSection("全年度", rank.subList(4,8)));
+
+                    } else if(rank.size() == 4) {
                         adapter.addSection(new RankSection("上半季", rank.subList(0,4)));
                     }
-                    if(rank.size() >= 8) {
-                        adapter.addSection(new RankSection("下半季", rank.subList(4,8)));
-                    }
-                    if(rank.size() >= 12) {
-                        adapter.addSection(new RankSection("全年度", rank.subList(8,12)));
-                    }
+
 
                     recyclerView.post(new Runnable() {
                         @Override

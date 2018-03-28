@@ -60,7 +60,7 @@ public class StatsListFragment extends Fragment {
             moreData = getArguments().getStringArrayList("moreData");
         }
 
-        if(!((MainActivity)getActivity()).isShowingProgressDialog() && getActivity() != null) {
+        if(!((MainActivity)getActivity()).isShowingProgressDialog() && getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
             ((MainActivity) getActivity()).showProgressDialog();
         }
 
@@ -176,7 +176,9 @@ public class StatsListFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            ((MainActivity)getActivity()).hideProgressDialog();
+                            if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
+                                ((MainActivity) getActivity()).hideProgressDialog();
+                            }
                             Toast.makeText(getContext(), "統計資料發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
                     });
