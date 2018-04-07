@@ -164,8 +164,8 @@ public class CalendarFragment extends Fragment {
                             public void run() {
                                 if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
                                     ((MainActivity) getActivity()).hideProgressDialog();
+                                    Toast.makeText(getContext(), "未有比賽資料。", Toast.LENGTH_LONG).show();
                                 }
-                                Toast.makeText(getContext(), "未有比賽資料。", Toast.LENGTH_LONG).show();
                             }
                         });
                     }
@@ -189,16 +189,18 @@ public class CalendarFragment extends Fragment {
 
                 }
 
-                recyclerView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        ((TextView) getActivity().findViewById(R.id.calendarTextView)).setText(year + "年" + month + "月");
+                if(!((MainActivity)getActivity()).isFinishing()) {
+                    recyclerView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            ((TextView) getActivity().findViewById(R.id.calendarTextView)).setText(year + "年" + month + "月");
 
-                        adapter.notifyDataSetChanged();
-                        ((MainActivity)getActivity()).hideProgressDialog();
+                            adapter.notifyDataSetChanged();
+                            ((MainActivity) getActivity()).hideProgressDialog();
 
-                    }
-                });
+                        }
+                    });
+                }
 
                 dataReference.removeEventListener(this);
             }
@@ -224,8 +226,8 @@ public class CalendarFragment extends Fragment {
                             public void run() {
                                 if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
                                     ((MainActivity) getActivity()).hideProgressDialog();
+                                    Toast.makeText(getContext(), "未有比賽資料。", Toast.LENGTH_LONG).show();
                                 }
-                                Toast.makeText(getContext(), "未有比賽資料。", Toast.LENGTH_LONG).show();
                             }
                         });
                     }
@@ -251,13 +253,15 @@ public class CalendarFragment extends Fragment {
                 section.removeAllItem();
                 section.addItem(gameList);
 
-                recyclerView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        adapter.notifyDataSetChanged();
-                        ((MainActivity)getActivity()).hideProgressDialog();
-                    }
-                });
+                if(!((MainActivity)getContext()).isFinishing()) {
+                    recyclerView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            adapter.notifyDataSetChanged();
+                            ((MainActivity) getActivity()).hideProgressDialog();
+                        }
+                    });
+                }
             }
 
             @Override

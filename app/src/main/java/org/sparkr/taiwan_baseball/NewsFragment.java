@@ -51,7 +51,7 @@ public class NewsFragment extends Fragment {
     private RecyclerView recyclerView;
     private int page = 0;
     private int visibleThreshold = 4;
-    private Boolean isLoading;
+    private Boolean isLoading = false;
     int lastVisibleItem, totalItemCount;
 
     public NewsFragment() {
@@ -168,8 +168,8 @@ public class NewsFragment extends Fragment {
                         public void run() {
                             if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
                                 ((MainActivity) getActivity()).hideProgressDialog();
+                                Toast.makeText(getContext(), "新聞資料發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                             }
-                            Toast.makeText(getContext(), "新聞資料發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
                     });
                 }

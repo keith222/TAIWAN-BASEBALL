@@ -178,8 +178,8 @@ public class StatsListFragment extends Fragment {
                         public void run() {
                             if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
                                 ((MainActivity) getActivity()).hideProgressDialog();
+                                Toast.makeText(getContext(), "統計資料發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                             }
-                            Toast.makeText(getContext(), "統計資料發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
                     });
                 }
