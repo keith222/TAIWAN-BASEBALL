@@ -189,7 +189,7 @@ public class CalendarFragment extends Fragment {
 
                 }
 
-                if(!((MainActivity)getActivity()).isFinishing()) {
+                if(recyclerView != null) {
                     recyclerView.post(new Runnable() {
                         @Override
                         public void run() {
@@ -253,7 +253,7 @@ public class CalendarFragment extends Fragment {
                 section.removeAllItem();
                 section.addItem(gameList);
 
-                if(!((MainActivity)getContext()).isFinishing()) {
+                if(recyclerView != null) {
                     recyclerView.post(new Runnable() {
                         @Override
                         public void run() {
