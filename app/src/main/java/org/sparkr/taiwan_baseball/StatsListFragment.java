@@ -45,7 +45,7 @@ public class StatsListFragment extends Fragment {
     private int totalPage = 1;
     private int page = 1;
     private int visibleThreshold = 4;
-    private Boolean isLoading;
+    private boolean isLoading = false;
     int lastVisibleItem, totalItemCount;
 
     public StatsListFragment() {
