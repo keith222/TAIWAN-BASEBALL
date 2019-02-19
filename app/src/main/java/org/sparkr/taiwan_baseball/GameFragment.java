@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
@@ -70,6 +71,7 @@ public class GameFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
 
         if(getActivity() != null && !((MainActivity)getContext()).isFinishing() && !((MainActivity)getActivity()).isShowingProgressDialog()) {
             ((MainActivity)getActivity()).showProgressDialog();
@@ -179,7 +181,6 @@ public class GameFragment extends Fragment {
         }
     }
 
-
     @Override
     public void onPause() {
         super.onPause();
@@ -193,10 +194,17 @@ public class GameFragment extends Fragment {
         Log.d("onPause", "onPause");
     }
 
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.action_calendar).setVisible(false);
+        super.onPrepareOptionsMenu(menu);
+    }
+
     private void setActionBar() {
         ((MainActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         ((MainActivity)getActivity()).getSupportActionBar().setTitle("賽事資訊");
         ((MainActivity)getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+
     }
 
     public class GameTimerTask extends TimerTask {

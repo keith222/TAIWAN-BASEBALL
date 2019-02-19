@@ -1,6 +1,8 @@
 package org.sparkr.taiwan_baseball;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -9,6 +11,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -71,21 +76,21 @@ public class CalendarFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
 
         adapter = new SectionedRecyclerViewAdapter();
 
         year = Calendar.getInstance().get(Calendar.YEAR);
         month = Calendar.getInstance().get(Calendar.MONTH) + 1;
 
-        if(month < 3) {
+        if (month < 2) {
             year--;
             month = 11;
-        } else if(month > 11){
-            month = 3;
+        } else if (month > 11) {
+            month = 11;
         }
 
         fetchGame(Integer.toString(year), Integer.toString(month));
-
     }
 
     @Override
@@ -109,24 +114,24 @@ public class CalendarFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
         ImageButton forwardImageButton = (ImageButton) view.findViewById(R.id.forwardImageButton);
-        forwardImageButton.setOnClickListener(new ImageButton.OnClickListener(){
+        forwardImageButton.setOnClickListener(new ImageButton.OnClickListener() {
             @Override
             public void onClick(View v) {
                 month += 1;
-                if(month > 11){
+                if (month > 11) {
                     year += 1;
-                    month = 3;
+                    month = 2;
                 }
                 fetchGame(Integer.toString(year), Integer.toString(month));
             }
         });
 
         ImageButton backImageButton = (ImageButton) view.findViewById(R.id.backImageButton);
-        backImageButton.setOnClickListener(new ImageButton.OnClickListener(){
+        backImageButton.setOnClickListener(new ImageButton.OnClickListener() {
             @Override
             public void onClick(View v) {
                 month -= 1;
-                if(month < 3){
+                if (month < 2) {
                     year -= 1;
                     month = 11;
                 }
@@ -137,32 +142,58 @@ public class CalendarFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_main, menu);
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_calendar) {
+            Intent intent = new Intent(getActivity(), DateSelectionActivity.class);
+            startActivityForResult(intent, 1);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+            year = data.getIntExtra("year", 0);
+            month = data.getIntExtra("month", 0);
+            fetchGame(Integer.toString(year), Integer.toString(month));
+        }
+    }
+
     private void fetchGame(final String year, final String month) {
-        if(getActivity().findViewById(R.id.calendarTextView) != null) {
+        if (getActivity().findViewById(R.id.calendarTextView) != null) {
             ((TextView) getActivity().findViewById(R.id.calendarTextView)).setText(year + "年" + month + "月");
         }
 
-        if(getActivity() != null && !((MainActivity)getContext()).isFinishing() && !((MainActivity)getActivity()).isShowingProgressDialog()) {
-            ((MainActivity)getActivity()).showProgressDialog();
+        if (getActivity() != null && !((MainActivity) getContext()).isFinishing() && !((MainActivity) getActivity()).isShowingProgressDialog()) {
+            ((MainActivity) getActivity()).showProgressDialog();
         }
 
         adapter.removeAllSections();
         adapter.notifyDataSetChanged();
 
         tempList = new ArrayList<>();
-        final Map<String , List<Game>> tempMap = new TreeMap<>();
+        final Map<String, List<Game>> tempMap = new TreeMap<>();
 
         final DatabaseReference dataReference = FirebaseDatabase.getInstance().getReference().getRef().child(year).child(month);
 
         dataReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.getChildrenCount() < 1) {
-                    if(getActivity() != null) {
+                if (dataSnapshot.getChildrenCount() < 1) {
+                    if (getActivity() != null) {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
+                                if (getActivity() != null && !((MainActivity) getContext()).isFinishing()) {
                                     ((MainActivity) getActivity()).hideProgressDialog();
                                     Toast.makeText(getContext(), "未有比賽資料。", Toast.LENGTH_LONG).show();
                                 }
@@ -174,22 +205,23 @@ public class CalendarFragment extends Fragment {
                 }
 
 
-                for(DataSnapshot snapshot: dataSnapshot.getChildren()) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     List<Game> gameList = new ArrayList<>();
-                    for(int i=0; i<snapshot.getChildrenCount(); i++) {
+                    for (int i = 0; i < snapshot.getChildrenCount(); i++) {
                         Game game = snapshot.child(Integer.toString(i)).getValue(Game.class);
                         gameList.add(game);
                     }
 
                     tempMap.put(dataSnapshot.getKey(), gameList);
                     Calendar calendar = Calendar.getInstance();
-                    calendar.set(Integer.parseInt(year), (Integer.parseInt(month) - 1), Integer.parseInt(snapshot.getKey()));;
+                    calendar.set(Integer.parseInt(year), (Integer.parseInt(month) - 1), Integer.parseInt(snapshot.getKey()));
+                    ;
                     int weekDay = calendar.get(Calendar.DAY_OF_WEEK);
                     adapter.addSection(new GameSection(month + "月" + snapshot.getKey() + "日 " + getChineseWeekDay(weekDay), gameList));
 
                 }
 
-                if(recyclerView != null) {
+                if (recyclerView != null) {
                     recyclerView.post(new Runnable() {
                         @Override
                         public void run() {
@@ -219,12 +251,12 @@ public class CalendarFragment extends Fragment {
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                if(dataSnapshot.getChildrenCount() < 1) {
-                    if(getActivity() != null) {
+                if (dataSnapshot.getChildrenCount() < 1) {
+                    if (getActivity() != null) {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
+                                if (getActivity() != null && !((MainActivity) getContext()).isFinishing()) {
                                     ((MainActivity) getActivity()).hideProgressDialog();
                                     Toast.makeText(getContext(), "未有比賽資料。", Toast.LENGTH_LONG).show();
                                 }
@@ -236,14 +268,14 @@ public class CalendarFragment extends Fragment {
                 }
 
                 List<Game> gameList = new ArrayList<>();
-                for(int i=0; i<dataSnapshot.getChildrenCount(); i++) {
+                for (int i = 0; i < dataSnapshot.getChildrenCount(); i++) {
                     Game game = dataSnapshot.child(Integer.toString(i)).getValue(Game.class);
                     gameList.add(game);
                 }
 
                 int index = 0;
-                for(int i = 0; i < tempMap.size(); i++) {
-                    if(tempMap.keySet().toArray()[i] == dataSnapshot.getKey()){
+                for (int i = 0; i < tempMap.size(); i++) {
+                    if (tempMap.keySet().toArray()[i] == dataSnapshot.getKey()) {
                         break;
                     }
                     index++;
@@ -253,7 +285,7 @@ public class CalendarFragment extends Fragment {
                 section.removeAllItem();
                 section.addItem(gameList);
 
-                if(recyclerView != null) {
+                if (recyclerView != null) {
                     recyclerView.post(new Runnable() {
                         @Override
                         public void run() {
@@ -283,21 +315,29 @@ public class CalendarFragment extends Fragment {
 
     private String getChineseWeekDay(int weekDay) {
         switch (weekDay) {
-            case 1: return "週日";
-            case 2: return "週一";
-            case 3: return "週二";
-            case 4: return "週三";
-            case 5: return "週四";
-            case 6: return "週五";
-            case 7: return "週六";
-            default: return "";
+            case 1:
+                return "週日";
+            case 2:
+                return "週一";
+            case 3:
+                return "週二";
+            case 4:
+                return "週三";
+            case 5:
+                return "週四";
+            case 6:
+                return "週五";
+            case 7:
+                return "週六";
+            default:
+                return "";
         }
     }
 
     private class GameSection extends StatelessSection {
 
-        private  String title;
-        private  List<Game> gameList;
+        private String title;
+        private List<Game> gameList;
 
         public GameSection(String title, List gameList) {
             super(new SectionParameters.Builder(R.layout.calendar_list).headerResourceId(R.layout.calendar_head).build());
@@ -330,14 +370,15 @@ public class CalendarFragment extends Fragment {
             Game game = gameList.get(position);
             itemHolder.gameNumberTextView.setText(gameString(game.getGame()));
             itemHolder.guestImageView.setImageResource(teamImageView(game.getGuest()));
-            itemHolder.guestScoreTextView.setText((game.getG_score().isEmpty())?"--":game.getG_score());
-            itemHolder.homeScoreTextView.setText((game.getH_score().isEmpty())?"--":game.getH_score());
+            itemHolder.guestScoreTextView.setText((game.getG_score().isEmpty()) ? "--" : game.getG_score());
+            itemHolder.homeScoreTextView.setText((game.getH_score().isEmpty()) ? "--" : game.getH_score());
             itemHolder.homeImageView.setImageResource(teamImageView(game.getHome()));
             itemHolder.placeTextView.setText(game.getPlace());
 
             itemHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
                     Fragment gameFragment = GameFragment.newInstance(gameList.get(position));
                     FragmentTransaction transaction = getFragmentManager().beginTransaction();
                     transaction.add(R.id.fragment_calendar_container, gameFragment, "GameFragment");
@@ -393,13 +434,13 @@ public class CalendarFragment extends Fragment {
     }
 
     private String gameString(int game) {
-        if(game == 0 ) {
+        if (game == 0) {
             return "All Stars Game";
-        } else if(game > 0) {
+        } else if (game > 0) {
             return "Game: " + game;
-        } else if(game < -10) {
-            return "季後挑戰賽: " + (-game%10);
-        } else if(game < 0) {
+        } else if (game < -10) {
+            return "季後挑戰賽: " + (-game % 10);
+        } else if (game < 0) {
             return "Taiwan Series: G" + (-game);
         }
 
@@ -408,14 +449,40 @@ public class CalendarFragment extends Fragment {
 
     private int teamImageView(String team) {
         switch (team) {
-            case "1": return R.mipmap.t1;
-            case "2": return R.mipmap.t2;
-            case "3": return R.mipmap.t3;
-            case "4": return R.mipmap.t4;
-            case "4-1": return R.mipmap.t4_1;
-            case "A-1": return R.mipmap.a_1;
-            case "A-2": return R.mipmap.a_2;
-            default: return R.mipmap.t1;
+            case "-5-2":
+                return R.mipmap.t_5_2;
+            case "-5-1":
+                return R.mipmap.t_5_1;
+            case "-5":
+                return R.mipmap.t_5;
+            case "-4":
+                return R.mipmap.t_4;
+            case "-3":
+                return R.mipmap.t_3;
+            case "-2":
+                return R.mipmap.t_2;
+            case "-1":
+                return R.mipmap.t_1;
+            case "1":
+                return R.mipmap.t1;
+            case "2":
+                return R.mipmap.t2;
+            case "3":
+                return R.mipmap.t3;
+            case "4":
+                return R.mipmap.t4;
+            case "4-1":
+                return R.mipmap.t4_1;
+            case "4-2":
+                return R.mipmap.t4_2;
+            case "4-3":
+                return R.mipmap.t4_3;
+            case "A-1":
+                return R.mipmap.a_1;
+            case "A-2":
+                return R.mipmap.a_2;
+            default:
+                return R.mipmap.t1;
         }
     }
 

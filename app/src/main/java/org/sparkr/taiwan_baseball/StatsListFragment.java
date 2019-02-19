@@ -146,8 +146,6 @@ public class StatsListFragment extends Fragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
 
-        Log.d("setUserVisibleHint", "setUserVisibleHint");
-
         if (isVisibleToUser) {
             setActionBar();
         }

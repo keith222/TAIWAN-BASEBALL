@@ -2,7 +2,6 @@ package org.sparkr.taiwan_baseball;
 
 import android.app.ProgressDialog;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -11,10 +10,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
-import com.google.firebase.iid.FirebaseInstanceId;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -38,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
     private String tempTitle = "";
     private int selectedIndex = 0;
+    private int[] yearMonth = new int[2];
 
     private int[] iconResId = {
             R.mipmap.tab_news,
@@ -67,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
         return selectedIndex;
     }
 
+    public int[] getSelectedYearMonth() { return yearMonth; }
+
     public void setTempTitle(String tempTitle) {
         this.tempTitle = tempTitle;
     }
@@ -91,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
         mViewPager.setAdapter(mSectionsPagerAdapter);
 //        mViewPager.setOffscreenPageLimit(4);
 
+
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
         tabLayout.getTabAt(0).setIcon(iconResId[0]);
@@ -113,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
                     if(gameFragment != null && gameFragment.isVisible()) {
                         gameFragment.setUserVisibleHint(true);
                     }
+
                 } else if(tab.getPosition() == 3) {
                     Fragment statsListFragment = getSupportFragmentManager().findFragmentByTag("StatsListFragment");
                     Fragment playerFragment = getSupportFragmentManager().findFragmentByTag("PlayerFragment");
@@ -189,6 +191,8 @@ public class MainActivity extends AppCompatActivity {
         onBackPressed();
         return true;
     }
+
+
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
