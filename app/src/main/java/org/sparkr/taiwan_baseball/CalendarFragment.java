@@ -479,6 +479,10 @@ public class CalendarFragment extends Fragment {
                 return R.mipmap.a_1;
             case "A-2":
                 return R.mipmap.a_2;
+            case "AS":
+                return R.mipmap.as;
+            case "CT":
+                return R.mipmap.ct;
             default:
                 return R.mipmap.t1;
         }
