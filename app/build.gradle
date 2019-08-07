@@ -22,8 +22,8 @@ android {
         applicationId "org.sparkr.taiwan_baseball"
         minSdkVersion 15
         targetSdkVersion 28
-        versionCode 15
-        versionName "1.1.3"
+        versionCode 16
+        versionName "1.1.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
