@@ -235,6 +235,7 @@ public class GameFragment extends Fragment {
         switch (team) {
             case "1": return R.mipmap.t1;
             case "2": return R.mipmap.t2;
+            case "3-0": return R.mipmap.t3_0;
             case "3": return R.mipmap.t3;
             case "4": return R.mipmap.t4;
             case "4-1": return R.mipmap.t4_1;

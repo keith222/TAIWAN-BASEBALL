@@ -225,9 +225,11 @@ public class RankFragment extends Fragment {
 
         public int getTeamImage(String team) {
             switch (team) {
+                case "味全": return R.mipmap.t__1;
                 case "中信兄弟": return R.mipmap.t1;
                 case "統一7-ELEVEn": return R.mipmap.t2;
                 case "Lamigo": return R.mipmap.t3;
+                case "樂天": return R.mipmap.t3_0;
                 case "富邦": return R.mipmap.t4;
                 case "義大": return R.mipmap.t4_1;
                 default: return R.mipmap.t1;
