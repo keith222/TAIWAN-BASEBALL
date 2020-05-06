@@ -252,8 +252,10 @@ public class StatsListFragment extends Fragment {
     private String getTeam(String fileName){
         if(fileName.contains("B03")){
             return "義大犀牛";
-        }else if(fileName.contains("A02")){
+        }else if(fileName.contains("A02")) {
             return "Lamigo";
+        }else if(fileName.contains("AJL011")) {
+            return "樂天";
         }else if(fileName.contains("E02")){
             return "中信兄弟";
         }else if(fileName.contains("L01")){
