@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v4.widget.NestedScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         xmlns:android="http://schemas.android.com/apk/res/android" >
@@ -30,7 +30,8 @@
                     android:text="000"
                     android:textAlignment="center"
                     android:textColor="#18191B"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:gravity="center_horizontal" />
 
                 <ImageView
                     android:id="@+id/guestImageView"
@@ -168,6 +169,6 @@
             </WebView>
 
         </LinearLayout>
-    </android.support.v4.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </FrameLayout>

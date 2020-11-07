@@ -6,7 +6,7 @@
     android:background="@color/white"
     tools:context="org.sparkr.taiwan_baseball.PlayerFragment">
 
-    <android.support.v4.widget.NestedScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         xmlns:android="http://schemas.android.com/apk/res/android" >
@@ -174,5 +174,5 @@
                 android:layout_marginTop="5sp" />
 
         </RelativeLayout>
-    </android.support.v4.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
 </FrameLayout>
