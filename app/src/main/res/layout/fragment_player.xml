@@ -8,8 +8,7 @@
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        xmlns:android="http://schemas.android.com/apk/res/android" >
+        android:layout_height="match_parent">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -69,20 +68,49 @@
                 android:textStyle="bold"
                 android:text="---｜---｜---" />
 
+            <LinearLayout
+                android:id="@+id/optionalView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/gameImageView"
+                android:layout_marginStart="15sp"
+                android:layout_marginLeft="15sp"
+                android:layout_marginTop="15sp"
+                android:layout_marginEnd="15sp"
+                android:layout_marginRight="15sp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="投球成績"
+                    android:textColor="#686868"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+
+                <WebView
+                    android:id="@+id/optionalWebView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5sp" />
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/statsTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/optionalView"
                 android:layout_alignParentStart="true"
-                android:layout_below="@+id/gameImageView"
-                android:layout_marginLeft="15sp"
+                android:layout_alignParentLeft="true"
                 android:layout_marginStart="15sp"
+                android:layout_marginLeft="15sp"
                 android:layout_marginTop="15sp"
-                android:textSize="17sp"
+                android:text="打擊成績"
                 android:textColor="#686868"
-                android:textStyle="bold"
-                android:text="打擊成績" />
+                android:textSize="17sp"
+                android:textStyle="bold" />
 
             <WebView
                 android:id="@+id/statsWebView"

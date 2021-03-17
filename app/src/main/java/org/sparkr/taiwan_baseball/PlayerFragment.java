@@ -110,8 +110,6 @@ public class PlayerFragment extends Fragment {
     }
 
     private void fetchPlayer(final View view) {
-        ((TextView)view.findViewById(R.id.statsTextView)).setText((playerData[1] == "0")?"打擊成績":"投球成績");
-
         final String cssString = "<style>.std_tb{color: #333;font-size: 13px;line-height: 2.2em;}table.std_tb tr{background-color: #f8f8f8;}table.mix_x tr:nth-child(2n+1), table.std_tb tr.change{background-color: #e6e6e6;}table.std_tb th {background-color: #081B2F;color: #fff;font-weight: normal;padding: 0 6px;}table.std_tb td{padding: 0 6px;}table.std_tb th a, table.std_tb th a:link, table.std_tb th a:visited, table.std_tb th a:active {color: #fff;}a, a:link, a:visited, a:active {text-decoration: none;}</style>";
 
         Request request = new Request.Builder().url(this.getString(R.string.CPBLSourceURL) + playerData[0].substring(1)).build();
@@ -142,10 +140,18 @@ public class PlayerFragment extends Fragment {
 
                     String headElement = doc.select(".player_info div img").attr("src").toString();
                     final String headURL = (headElement.endsWith(".jpg") || headElement.endsWith(".png")) ? headElement : (headElement + "/phone/images/playerhead.png");
-
                     final String gameURL = headURL.replace("head", "game");
-                    final String statsHtml = cssString + doc.select(".std_tb").get(0).toString().replace("display:none;", "");;
-                    final String fieldHtml = cssString + doc.select(".std_tb").get(1).toString().replace("詳細","");
+
+                    String optionalHtml = "";
+                    Integer recordCount = 0;
+                    if(doc.select(".gap_b20").get(1).select(".std_tb").size() > 2) {
+                        recordCount++;
+                        optionalHtml = cssString + doc.select(".std_tb").get(0).toString().replace("display:none;", "");
+                    }
+
+
+                    final String statsHtml = cssString + doc.select(".std_tb").get(recordCount).toString().replace("display:none;", "");;
+                    final String fieldHtml = cssString + doc.select(".std_tb").get(recordCount + 1).toString().replace("詳細","");
                     final String teamHtml = cssString + doc.select(".std_tb").get(doc.select(".std_tb").size() - 2).toString().replace("display:none;", "");
                     final String singleHtml = cssString + doc.select(".std_tb").get(doc.select(".std_tb").size() - 1).toString();
                     final String playerInfo = (doc.select(".player_info_name").text().isEmpty()) ? doc.select(".player_info3_name").text() : doc.select(".player_info_name").text().replace(" ", "").replace("球隊:","｜");;
@@ -174,11 +180,18 @@ public class PlayerFragment extends Fragment {
                     final String infoString = position + "｜" + batpitch + "｜" + height + "/" + weight;
 
                     if(getActivity() != null) {
+                        final String finalOptionalHtml = optionalHtml;
+
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 Glide.with(getContext()).load(headURL).centerCrop().into((ImageView)view.findViewById(R.id.headImageView));
-                                Glide.with(getContext()).load(gameURL).into((ImageView)view.findViewById(R.id.gameImageView));
+                                Glide.with(getContext()).load(gameURL).placeholder(R.drawable.launch_screen).into((ImageView)view.findViewById(R.id.gameImageView));
+
+                                if(!finalOptionalHtml.isEmpty()) {
+                                    view.findViewById(R.id.optionalView).setVisibility(View.VISIBLE);
+                                    ((WebView)view.findViewById(R.id.optionalWebView)).loadData(finalOptionalHtml, "text/html; charset=utf-8", "UTF-8");
+                                }
 
                                 ((WebView)view.findViewById(R.id.statsWebView)).loadData(statsHtml, "text/html; charset=utf-8", "UTF-8");
                                 ((WebView)view.findViewById(R.id.fieldingWebView)).loadData(fieldHtml, "text/html; charset=utf-8", "UTF-8");
@@ -188,6 +201,8 @@ public class PlayerFragment extends Fragment {
                                 ((TextView)view.findViewById(R.id.nameTextView)).setText(playerInfo);
                                 ((TextView)view.findViewById(R.id.dataTextView)).setText(infoString);
 
+                                final String titleString = (view.findViewById(R.id.optionalView).getVisibility() == View.GONE)? ((playerData[1] == "0")?"打擊成績":"投球成績") : "打擊成績";
+                                ((TextView)view.findViewById(R.id.statsTextView)).setText(titleString);
                                 ((MainActivity)getActivity()).hideProgressDialog();
                             }
                         });

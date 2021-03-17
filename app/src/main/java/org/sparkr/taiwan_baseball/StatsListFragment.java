@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +25,7 @@ import org.sparkr.taiwan_baseball.Model.StatsList;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import okhttp3.Call;
@@ -196,7 +198,8 @@ public class StatsListFragment extends Fragment {
 
                         int categoryIndex = getCategoryIndex(category);
                         String numData = node.select("td").get(0).text();
-                        String nameData = node.select("td").get(1).text().replace("*","").trim();
+                        String[] nameDataArray = node.select("td").get(1).text().replace("*","").trim().split(" ");
+                        String nameData = TextUtils.join(" ", Arrays.copyOfRange(nameDataArray, 1, nameDataArray.length));
                         String teamData = getTeam(node.select("td").get(1).select("img").attr("src").toString());
                         String statsData = node.select("td").get(categoryIndex).text();
                         String playerURLData = node.select("td").get(1).select("a").attr("href").toString();
@@ -263,7 +266,10 @@ public class StatsListFragment extends Fragment {
             return "統一獅";
         }else if(fileName.contains("B04")){
             return "富邦";
+        }else if(fileName.contains("D01")) {
+            return "味全";
         }
+
         return "無";
     }
 
