@@ -15,7 +15,9 @@ import android.widget.Toast;
 
 import java.io.IOException;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
@@ -99,6 +101,7 @@ public class RankFragment extends Fragment {
 
     public void fetchRank(final String year) {
         Request request = new Request.Builder().url(this.getString(R.string.CPBLSourceURL) + "standing/year/"+ year +".html").build();
+
         Call mcall = client.newCall(request);
         mcall.enqueue(new Callback() {
             @Override
@@ -146,17 +149,17 @@ public class RankFragment extends Fragment {
 
                     }
 
-                    if(rank.size() == 12) {
-                        adapter.addSection(new RankSection("上半季", rank.subList(0,4)));
-                        adapter.addSection(new RankSection("下半季", rank.subList(4,8)));
-                        adapter.addSection(new RankSection("全年度", rank.subList(8,12)));
+                    if(rank.size() == 15) {
+                        adapter.addSection(new RankSection("上半季", rank.subList(0,5)));
+                        adapter.addSection(new RankSection("下半季", rank.subList(5,10)));
+                        adapter.addSection(new RankSection("全年度", rank.subList(10,15)));
 
-                    } else if(rank.size() == 8) {
-                        adapter.addSection(new RankSection("上半季", rank.subList(0,4)));
-                        adapter.addSection(new RankSection("全年度", rank.subList(4,8)));
+                    } else if(rank.size() == 10) {
+                        adapter.addSection(new RankSection("上半季", rank.subList(0,5)));
+                        adapter.addSection(new RankSection("全年度", rank.subList(5,10)));
 
-                    } else if(rank.size() == 4) {
-                        adapter.addSection(new RankSection("上半季", rank.subList(0,4)));
+                    } else if(rank.size() == 5) {
+                        adapter.addSection(new RankSection("上半季", rank.subList(0,5)));
                     }
 
 
@@ -184,6 +187,7 @@ public class RankFragment extends Fragment {
 
         public RankSection(String title, List rankList) {
             super(new SectionParameters.Builder(R.layout.rank_list).headerResourceId(R.layout.rank_head).build());
+
             this.title = title;
             this.rankList = rankList;
         }
@@ -226,13 +230,11 @@ public class RankFragment extends Fragment {
 
         public int getTeamImage(String team) {
             switch (team) {
-                case "味全": return R.mipmap.t__1;
+                case "味全龍": return R.mipmap.t__1;
                 case "中信兄弟": return R.mipmap.t1;
                 case "統一7-ELEVEn": return R.mipmap.t2;
-                case "Lamigo": return R.mipmap.t3;
-                case "樂天": return R.mipmap.t3_0;
-                case "富邦": return R.mipmap.t4;
-                case "義大": return R.mipmap.t4_1;
+                case "樂天桃猿": return R.mipmap.t3_0;
+                case "富邦悍將": return R.mipmap.t4;
                 default: return R.mipmap.t1;
             }
         }
