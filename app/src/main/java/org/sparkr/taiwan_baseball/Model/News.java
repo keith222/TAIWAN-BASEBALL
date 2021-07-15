@@ -10,10 +10,10 @@ public class News {
     private String imageUrl;
     private String newsUrl;
 
-    public News(String title, String date, String imageurl, String newsUrl) {
+    public News(String title, String date, String imageUrl, String newsUrl) {
         this.title = title;
         this.date = date;
-        this.imageUrl = imageurl;
+        this.imageUrl = imageUrl;
         this.newsUrl = newsUrl;
     }
 
