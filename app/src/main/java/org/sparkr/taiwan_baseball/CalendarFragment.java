@@ -366,11 +366,11 @@ public class CalendarFragment extends Fragment {
             final ItemViewHolder itemHolder = (ItemViewHolder) holder;
 
             Game game = gameList.get(position);
-            itemHolder.gameNumberTextView.setText(gameString(game.getGame()));
-            itemHolder.guestImageView.setImageResource(teamImageView(game.getGuest()));
+            itemHolder.gameNumberTextView.setText(Utils.gameString(game.getGame()));
+            itemHolder.guestImageView.setImageResource(Utils.teamImageView(game.getGuest()));
             itemHolder.guestScoreTextView.setText((game.getG_score().isEmpty()) ? "--" : game.getG_score());
             itemHolder.homeScoreTextView.setText((game.getH_score().isEmpty()) ? "--" : game.getH_score());
-            itemHolder.homeImageView.setImageResource(teamImageView(game.getHome()));
+            itemHolder.homeImageView.setImageResource(Utils.teamImageView(game.getHome()));
             itemHolder.placeTextView.setText(game.getPlace());
 
             itemHolder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -430,65 +430,4 @@ public class CalendarFragment extends Fragment {
             placeTextView = (TextView) itemView.findViewById(R.id.placeTextView);
         }
     }
-
-    private String gameString(int game) {
-        if (game == 0) {
-            return "All Stars Game";
-        } else if (game > 0) {
-            return "Game: " + game;
-        } else if (game < -10) {
-            return "季後挑戰賽: " + (-game % 10);
-        } else if (game < 0) {
-            return "Taiwan Series: G" + (-game);
-        }
-
-        return "";
-    }
-
-    private int teamImageView(String team) {
-        switch (team) {
-            case "-5-2":
-                return R.mipmap.t_5_2;
-            case "-5-1":
-                return R.mipmap.t_5_1;
-            case "-5":
-                return R.mipmap.t_5;
-            case "-4":
-                return R.mipmap.t_4;
-            case "-3":
-                return R.mipmap.t_3;
-            case "-2":
-                return R.mipmap.t_2;
-            case "-1":
-                return R.mipmap.t_1;
-            case "1":
-                return R.mipmap.t1;
-            case "2":
-                return R.mipmap.t2;
-            case "3-0":
-                return R.mipmap.t3_0;
-            case "3":
-                return R.mipmap.t3;
-            case "4":
-                return R.mipmap.t4;
-            case "4-1":
-                return R.mipmap.t4_1;
-            case "4-2":
-                return R.mipmap.t4_2;
-            case "4-3":
-                return R.mipmap.t4_3;
-            case "A-1":
-                return R.mipmap.a_1;
-            case "A-2":
-                return R.mipmap.a_2;
-            case "AS":
-                return R.mipmap.as;
-            case "CT":
-                return R.mipmap.ct;
-            default:
-                return R.mipmap.t1;
-        }
-    }
-
-
 }
