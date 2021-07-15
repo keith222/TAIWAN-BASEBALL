@@ -17,25 +17,25 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics;
 public class MainActivity extends AppCompatActivity {
 
     /**
-     * The {@link androidx.core.view.PagerAdapter} that will provide
+     * The  androidx.core.view.PagerAdapter that will provide
      * fragments for each of the sections. We use a
      * {@link FragmentPagerAdapter} derivative, which will keep every
      * loaded fragment in memory. If this becomes too memory intensive, it
      * may be best to switch to a
-     * {@link androidx.core.app.FragmentStatePagerAdapter}.
+     * androidx.core.app.FragmentStatePagerAdapter.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ProgressDialog progressDialog;
     /**
      * The {@link ViewPager} that will host the section contents.
      */
-    private ViewPager mViewPager;
+    private CustomViewPager mViewPager;
 
     private String tempTitle = "";
     private int selectedIndex = 0;
-    private int[] yearMonth = new int[2];
+    private final int[] yearMonth = new int[2];
 
-    private int[] iconResId = {
+    private final int[] iconResId = {
             R.mipmap.tab_news,
             R.mipmap.tab_rank,
             R.mipmap.tab_calendar,
@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
             R.mipmap.tab_video
     };
 
-    private int[] selectedIconresId = {
+    private final int[] selectedIconresId = {
             R.mipmap.tab_news_fill,
             R.mipmap.tab_rank_fill,
             R.mipmap.tab_calendar_fill,
@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
             R.mipmap.tab_video_fill
     };
 
-    private String[] titleArray = {
+    private final String[] titleArray = {
             "職棒新聞",
             "聯盟排名",
             "職棒賽程",
@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         // Create the adapter that will return a fragment for each of the three
@@ -85,12 +85,12 @@ public class MainActivity extends AppCompatActivity {
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager = findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 //        mViewPager.setOffscreenPageLimit(4);
 
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
         tabLayout.getTabAt(0).setIcon(iconResId[0]);
         getSupportActionBar().setTitle(titleArray[0]);
@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
                 if(tab.getPosition() == 2) {
                     Fragment gameFragment = getSupportFragmentManager().findFragmentByTag("GameFragment");
                     if(gameFragment != null && gameFragment.isVisible()) {
-                        gameFragment.setUserVisibleHint(true);
+                        gameFragment.setMenuVisibility(true);
                     }
 
                 } else if(tab.getPosition() == 3) {
@@ -118,11 +118,11 @@ public class MainActivity extends AppCompatActivity {
                     Fragment playerFragment = getSupportFragmentManager().findFragmentByTag("PlayerFragment");
 
                     if(statsListFragment != null && statsListFragment.isVisible()) {
-                        statsListFragment.setUserVisibleHint(true);
+                        statsListFragment.setMenuVisibility(true);
                     }
 
                     if(playerFragment != null && playerFragment.isVisible()) {
-                        playerFragment.setUserVisibleHint(true);
+                        playerFragment.setMenuVisibility(true);
                     }
                 }
             }
@@ -151,6 +151,10 @@ public class MainActivity extends AppCompatActivity {
         if(progressDialog != null) {
             progressDialog.dismiss();
         }
+    }
+
+    public void setPagingEnabled(boolean value) {
+        mViewPager.setPagingEnabled(value);
     }
 
     public boolean isShowingProgressDialog() {
@@ -196,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    public static class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -208,7 +212,6 @@ public class MainActivity extends AppCompatActivity {
             // Return a PlaceholderFragment (defined as a static inner class below).
             //return PlaceholderFragment.newInstance(position + 1);
             switch (position) {
-                case 0: return NewsFragment.newInstance();
                 case 1: return RankFragment.newInstance();
                 case 2: return CalendarFragment.newInstance();
                 case 3: return StatisticsFragment.newInstance();

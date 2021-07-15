@@ -30,7 +30,7 @@
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabs"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:background="@color/white"
             app:tabIndicatorColor="@color/CPBLBlue"
             app:tabSelectedTextColor="@color/CPBLBlue">
@@ -69,12 +69,18 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.viewpager.widget.ViewPager
+    <org.sparkr.taiwan_baseball.CustomViewPager
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
+    </org.sparkr.taiwan_baseball.CustomViewPager>
+<!--    <androidx.viewpager.widget.ViewPager-->
+<!--        android:id="@+id/container"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        app:layout_behavior="@string/appbar_scrolling_view_behavior">-->
 
-    </androidx.viewpager.widget.ViewPager>
+<!--    </androidx.viewpager.widget.ViewPager>-->
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
