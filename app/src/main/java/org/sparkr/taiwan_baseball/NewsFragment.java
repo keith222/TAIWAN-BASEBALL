@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,9 +21,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
 import java.io.IOException;
 
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +37,11 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.sparkr.taiwan_baseball.Model.News;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -45,12 +57,12 @@ import okhttp3.Response;
  */
 public class NewsFragment extends Fragment {
 
-    private OkHttpClient client = new OkHttpClient();
-    private List newsList;
+    private OkHttpClient client;
+    private List<News> newsList;
     private NewsAdapter adapter;
     private RecyclerView recyclerView;
-    private int page = 0;
-    private int visibleThreshold = 4;
+    private int page = 1;
+    private final int visibleThreshold = 4;
     private Boolean isLoading = false;
     int lastVisibleItem, totalItemCount;
 
@@ -76,15 +88,16 @@ public class NewsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Utils.handleSSLHandshake();
         newsList = new ArrayList<>();
         adapter = new NewsAdapter(newsList);
+        client = Utils.getUnsafeOkHttpClient().build();
 
-        if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
+        if(getActivity() != null && !((getContext() != null) && ((MainActivity)getContext()).isFinishing())) {
             ((MainActivity)getActivity()).showProgressDialog();
         }
 
         fetchNews(page);
-
     }
 
     @Override
@@ -92,7 +105,7 @@ public class NewsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_news, container, false);
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.newsRecyclerView);
+        recyclerView = view.findViewById(R.id.newsRecyclerView);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
@@ -102,7 +115,7 @@ public class NewsFragment extends Fragment {
             public Boolean isScrolled = false;
 
             @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
 
                 if(newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
@@ -111,7 +124,7 @@ public class NewsFragment extends Fragment {
             }
 
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
 
                 if(!isScrolled) { return; }
@@ -120,12 +133,9 @@ public class NewsFragment extends Fragment {
                 lastVisibleItem = layoutManager.findLastVisibleItemPosition();
 
                 if (!isLoading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
-                    recyclerView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            newsList.add(null);
-                            adapter.notifyItemInserted(newsList.size() - 1);
-                        }
+                    recyclerView.post(() -> {
+                        newsList.add(null);
+                        adapter.notifyItemInserted(newsList.size() - 1);
                     });
 
                     page++;
@@ -156,79 +166,62 @@ public class NewsFragment extends Fragment {
         isLoading = false;
     }
 
+
+
     private void fetchNews(final int newPage) {
-        Request request = new Request.Builder().url(this.getString(R.string.CPBLSourceURL) + "news/lists/news_lits.html?per_page=" + newPage).build();
-        Call mcall = client.newCall(request);
-        mcall.enqueue(new Callback() {
+        Request request = new Request.Builder().url(this.getString(R.string.CPBLSourceURL) + "/xmdoc?page=" + newPage).build();
+        Call mCall = client.newCall(request);
+        mCall.enqueue(new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 if(getContext() != null && getActivity() != null) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
-                                ((MainActivity) getActivity()).hideProgressDialog();
-                                Toast.makeText(getContext(), "新聞資料發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
-                            }
+                    getActivity().runOnUiThread(() -> {
+                        if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
+                            ((MainActivity) getActivity()).hideProgressDialog();
+                            Toast.makeText(getContext(), "新聞資料發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
                     });
                 }
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                final String resStr = response.body().string();
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                final String resStr = (response.body() != null) ? response.body().string() : "";
                 News news;
 
                 try {
                     Document doc = Jsoup.parse(resStr);
 
-                    String topNewsTitle = doc.select(".news_head_title > a").text();
-                    String topNewsDate = doc.select(".news_head_date").text();
-                    String topNewsUrl = doc.select(".games_news_pic > a").attr("href").toString();
-                    String topNewsImageUrl = doc.select(".games_news_pic > a > img").attr("src").toString();
-
-                    if(!topNewsTitle.isEmpty()) {
-                        news = new News(topNewsTitle, topNewsDate, topNewsImageUrl, topNewsUrl);
-                        newsList.add(news);
-                    }
-
-                    final Elements nodes = doc.select(".news_row");
+                    final Elements nodes = doc.select(".NewsList > .item");
                     for(Element node: nodes) {
-                        if (node.select(".news_row_date").text().isEmpty()) {continue;}
-
-                        String newstitle = node.select(".news_row_cont > div > a.news_row_title").text().trim();
-                        String tmpeDate = node.select(".news_row_date").text().trim();
-                        String newsDate = tmpeDate.substring(0,10);
-                        String newsImageUrl = node.select(".news_row_pic > img").attr("src").toString();
-                        String newsUrl = node.select(".news_row_cont > div > a").attr("href").toString();
-
-                        news = new News(newstitle, newsDate, newsImageUrl, newsUrl);
+                        Elements newsTitleNode = node.select(".title > a");
+                        String newsTitle = newsTitleNode.text().trim();
+                        String newsDate = node.select(".date").text().trim();
+                        String newsImageUrl = node.select(".img a").attr("style").replaceAll(".*?(h[^)]*)\\)", "$1");
+                        String newsUrl = newsTitleNode.attr("href");
+                        news = new News(newsTitle, newsDate, newsImageUrl, newsUrl);
                         newsList.add(news);
                     }
 
-                    adapter.setOnClick(new NewsAdapter.OnItemClicked(){
-                        @Override
-                        public void onItemClick(int position) {
-                            News selectedNews = (News) newsList.get(position);
+                    adapter.setOnClick(position -> {
+                        News selectedNews = newsList.get(position);
+                        if (getActivity() != null) {
                             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getActivity().getString(R.string.CPBLSourceURL) + selectedNews.getNewsUrl()));
                             startActivity(intent);
                         }
                     });
 
-                    recyclerView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            adapter.notifyDataSetChanged();
+                    recyclerView.post(() -> {
+                        adapter.notifyDataSetChanged();
+                        if((newsList.size() - nodes.size() - 1) > 0) {
+                            newsList.remove(newsList.size() - nodes.size() - 1);
+                            adapter.notifyItemRemoved(newsList.size());
+                        }
 
-                            if((newsList.size() - nodes.size() - 1) > 0) {
-                                newsList.remove(newsList.size() - nodes.size() - 1);
-                                adapter.notifyItemRemoved(newsList.size());
-                            }
+                        setLoaded();
 
-                            setLoaded();
-
-                            ((MainActivity)getActivity()).hideProgressDialog();
+                        if (getActivity() != null) {
+                            ((MainActivity) getActivity()).hideProgressDialog();
                         }
                     });
 
@@ -241,7 +234,7 @@ public class NewsFragment extends Fragment {
 
     public static class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-        private List<News> news;
+        private final List<News> news;
         private OnItemClicked onClick;
 
         public interface OnItemClicked {
@@ -252,7 +245,7 @@ public class NewsFragment extends Fragment {
             this.news = news;
         }
 
-        public class NewsViewHolder extends RecyclerView.ViewHolder {
+        public static class NewsViewHolder extends RecyclerView.ViewHolder {
 
             private final TextView newsTitleTextView;
             private final TextView newsDateTextView;
@@ -262,53 +255,62 @@ public class NewsFragment extends Fragment {
             public NewsViewHolder(View itemView) {
                 super(itemView);
 
-                newsTitleTextView = (TextView) itemView.findViewById(R.id.newsTitleTextView);
-                newsDateTextView = (TextView) itemView.findViewById(R.id.newsDateTextView);
-                newsImageView = (ImageView) itemView.findViewById(R.id.newsImageView);
+                newsTitleTextView = itemView.findViewById(R.id.newsTitleTextView);
+                newsDateTextView = itemView.findViewById(R.id.newsDateTextView);
+                newsImageView = itemView.findViewById(R.id.newsImageView);
             }
         }
 
-        public class LoadingViewHolder extends RecyclerView.ViewHolder {
+        public static class LoadingViewHolder extends RecyclerView.ViewHolder {
             public ProgressBar progressBar;
 
             public LoadingViewHolder(View view) {
                 super(view);
-                progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+                progressBar = view.findViewById(R.id.progressBar);
             }
         }
 
+        @NonNull
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             Context context = parent.getContext();
 
             if(viewType == 0) {
                 View view = LayoutInflater.from(context).inflate(R.layout.news_list, parent, false);
-                NewsViewHolder newsViewHolder = new NewsViewHolder(view);
-                return newsViewHolder;
+                return new NewsViewHolder(view);
 
             } else {
                 View view = LayoutInflater.from(context).inflate(R.layout.item_loading, parent, false);
-                LoadingViewHolder loadingViewHolder = new LoadingViewHolder(view);
-                return loadingViewHolder;
+                return new LoadingViewHolder(view);
             }
         }
 
         @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
             if(holder instanceof NewsViewHolder) {
                 News newsData = news.get(position);
                 NewsViewHolder newsViewHolder = (NewsViewHolder)holder;
                 newsViewHolder.newsTitleTextView.setText(newsData.getTitle());
                 newsViewHolder.newsDateTextView.setText(newsData.getDate());
                 newsViewHolder.newsURL = newsData.getNewsUrl();
-                Glide.with(newsViewHolder.newsImageView.getContext()).load(newsData.getImageUrl()).centerCrop().into(newsViewHolder.newsImageView);
 
-                newsViewHolder.newsImageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        onClick.onItemClick(position);
-                    }
-                });
+                Glide.with(newsViewHolder.newsImageView.getContext())
+                        .load(newsData.getImageUrl())
+                        .listener(new RequestListener<String, GlideDrawable>() {
+                            @Override
+                            public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                                Log.e("Error", e.getLocalizedMessage());
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                                return false;
+                            }
+                        })
+                        .centerCrop().into(newsViewHolder.newsImageView);
+
+                newsViewHolder.newsImageView.setOnClickListener(v -> onClick.onItemClick(position));
 
             } else if(holder instanceof LoadingViewHolder){
                 LoadingViewHolder loadingViewHolder = (LoadingViewHolder)holder;
