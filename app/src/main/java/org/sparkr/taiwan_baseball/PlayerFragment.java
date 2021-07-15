@@ -1,31 +1,16 @@
 package org.sparkr.taiwan_baseball;
 
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
+
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import com.bumptech.glide.Glide;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
-
-import java.io.IOException;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import android.webkit.WebViewClient;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -34,8 +19,6 @@ import okhttp3.Response;
  */
 public class PlayerFragment extends Fragment {
 
-    private OkHttpClient client = new OkHttpClient();
-    private String playerURL;
     private String[] playerData;
 
     public PlayerFragment() {
@@ -66,6 +49,10 @@ public class PlayerFragment extends Fragment {
         if(getActivity() != null && !((MainActivity)getContext()).isFinishing() && !((MainActivity)getActivity()).isShowingProgressDialog()) {
             ((MainActivity)getActivity()).showProgressDialog();
         }
+
+        if (getActivity() != null) {
+            ((MainActivity)getActivity()).setPagingEnabled(false);
+        }
     }
 
     @Override
@@ -88,142 +75,108 @@ public class PlayerFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-
-        client.dispatcher().cancelAll();
     }
 
     @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
+    public void onDestroy() {
+        super.onDestroy();
 
-        Log.d("setUserVisibleHint", "setUserVisibleHint");
+        if (getActivity() != null) {
+            ((MainActivity)getActivity()).setPagingEnabled(true);
+        }
+    }
 
-        if (isVisibleToUser) {
+    @Override
+    public void setMenuVisibility(boolean menuVisible) {
+        super.setMenuVisibility(menuVisible);
+
+        if (menuVisible) {
             setActionBar();
         }
     }
 
     private void setActionBar() {
-        ((MainActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        ((MainActivity)getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
-        ((MainActivity)getActivity()).getSupportActionBar().setTitle("選手資訊");
+        if (getActivity() != null) {
+            ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+            ((MainActivity) getActivity()).getSupportActionBar().setTitle("選手資訊");
+        }
     }
 
     private void fetchPlayer(final View view) {
-        final String cssString = "<style>.std_tb{color: #333;font-size: 13px;line-height: 2.2em;}table.std_tb tr{background-color: #f8f8f8;}table.mix_x tr:nth-child(2n+1), table.std_tb tr.change{background-color: #e6e6e6;}table.std_tb th {background-color: #081B2F;color: #fff;font-weight: normal;padding: 0 6px;}table.std_tb td{padding: 0 6px;}table.std_tb th a, table.std_tb th a:link, table.std_tb th a:visited, table.std_tb th a:active {color: #fff;}a, a:link, a:visited, a:active {text-decoration: none;}</style>";
+        final String specialJSCode = "function changeStyle() {\n" +
+                "                document.querySelectorAll('.PlayerHeader').forEach(function(a){a.remove()});\n" +
+                "                document.querySelectorAll('.search').forEach(function(a){a.remove()});\n" +
+                "                document.querySelectorAll('.record_table_swipe_guide').forEach(function(a){a.remove()});\n" +
+                "                document.querySelectorAll('.record_table_scroll_ctrl').forEach(function(a){a.remove()});\n" +
+                "                document.querySelectorAll('.PageTitle').forEach(function(a){a.remove()});\n" +
+                "                document.querySelectorAll('.BtnTop').forEach(function(a){a.remove()});\n" +
+                "                document.querySelectorAll('.born').forEach(function(a){a.remove()});\n" +
+                "                document.querySelectorAll('.debut').forEach(function(a){a.remove()});\n" +
+                "                document.querySelectorAll('.edu').forEach(function(a){a.remove()});\n" +
+                "                document.querySelectorAll('.nationality').forEach(function(a){a.remove()});\n" +
+                "                document.querySelectorAll('.original_name').forEach(function(a){a.remove()});\n" +
+                "                document.querySelectorAll('.draft').forEach(function(a){a.remove()});\n" +
+                "                document.getElementById('Footer').remove();\n" +
+                "                document.getElementById('MenuMobile').remove();\n" +
+                "                document.getElementById('Header').remove();\n" +
+                "                document.getElementById('Breadcrumbs').remove();\n" +
+                "                document.getElementById('nav').remove();\n" +
+                "                const cssTemplateString = `\n" +
+                "                *{-webkit-touch-callout:none;-webkit-user-select:none}\n" +
+                "                body {background-color: white;}\n" +
+                "                .DistTitle h3, .DistTitle .en {color: #081B2F }\n" +
+                "                .RecordTable th{background-color: #081B2F}\n" +
+                "                .PlayerBrief dd .desc{color: #081B2F}\n" +
+                "                .PlayerBrief dd .label{color: #666}\n" +
+                "                .PlayerBrief > div {background-color: rgba(255,255,255,0.8)}\n" +
+                "                .PlayerBrief {background: #081B2F}\n" +
+                "                .PlayerBrief dt { color: #081B2F }\n" +
+                "                .PlayerBrief:after{background: none}\n" +
+                "                .ContHeader {margin-top: -35px}\n" +
+                "                `;\n" +
+                "                const styleTag = document.createElement('style');\n" +
+                "                styleTag.innerHTML = cssTemplateString;\n" +
+                "                document.head.insertAdjacentElement(`beforeend`, styleTag)\n" +
+                "            };\n" +
+                "            changeStyle();";
 
-        Request request = new Request.Builder().url(this.getString(R.string.CPBLSourceURL) + playerData[0].substring(1)).build();
-        Call mCall = client.newCall(request);
-        mCall.enqueue(new Callback() {
+        WebView playerWebView = view.findViewById(R.id.playerWebView);
+        playerWebView.setWebViewClient(new WebViewClient(){
             @Override
-            public void onFailure(Call call, IOException e) {
-                if(getContext() != null && getActivity() != null) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
-                                ((MainActivity) getActivity()).hideProgressDialog();
-                                Toast.makeText(getContext(), "選手資訊發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    });
-                }
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                super.onPageStarted(view, url, favicon);
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                final String resStr = response.body().string();
-                //gameHtmlString = cssString;
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
 
-                try{
-                    Document doc = Jsoup.parse(resStr);
-
-                    String headElement = doc.select(".player_info div img").attr("src").toString();
-                    final String headURL = (headElement.endsWith(".jpg") || headElement.endsWith(".png")) ? headElement : (headElement + "/phone/images/playerhead.png");
-                    final String gameURL = headURL.replace("head", "game");
-
-                    String optionalHtml = "";
-                    Integer recordCount = 0;
-                    if(doc.select(".gap_b20").get(1).select(".std_tb").size() > 2) {
-                        recordCount++;
-                        optionalHtml = cssString + doc.select(".std_tb").get(0).toString().replace("display:none;", "");
+                view.evaluateJavascript(specialJSCode, (result) -> {
+                    if (getActivity() != null) {
+                        view.setVisibility(View.VISIBLE);
+                        ((MainActivity)getActivity()).hideProgressDialog();
                     }
+                });
+            }
 
-
-                    final String statsHtml = cssString + doc.select(".std_tb").get(recordCount).toString().replace("display:none;", "");;
-                    final String fieldHtml = cssString + doc.select(".std_tb").get(recordCount + 1).toString().replace("詳細","");
-                    final String teamHtml = cssString + doc.select(".std_tb").get(doc.select(".std_tb").size() - 2).toString().replace("display:none;", "");
-                    final String singleHtml = cssString + doc.select(".std_tb").get(doc.select(".std_tb").size() - 1).toString();
-                    final String playerInfo = (doc.select(".player_info_name").text().isEmpty()) ? doc.select(".player_info3_name").text() : doc.select(".player_info_name").text().replace(" ", "").replace("球隊:","｜");;
-
-                    String position,batpitch,height,weight;
-                    Elements playerInfoOther = doc.select(".player_info_other tr:first-child td");
-                    if(playerInfoOther.size() < 1) {
-                        playerInfoOther = doc.select(".player_info3_other tr:first-child td");
-                        position = playerInfoOther.get(0).text().split(":")[1];
-                        batpitch = playerInfoOther.get(1).text().split(":")[1];
-                        Elements playerInfoOther2 = doc.select(".player_info3_other tr:nth-child(2) td");
-                        height = playerInfoOther2.get(0).text().split(":")[1];
-                        height = height.replaceAll("\\(?\\)?", "").toLowerCase();
-                        weight = playerInfoOther2.get(1).toString().split(":")[1];
-                        weight = weight.replaceAll("\\(?\\)?", "").toLowerCase();
-
-                    } else {
-                        position = playerInfoOther.get(0).text().split(":")[1];
-                        batpitch = playerInfoOther.get(1).text().split(":")[1];
-                        height = playerInfoOther.get(2).text().split(":")[1];
-                        height = height.replaceAll("\\(?\\)?", "").toLowerCase();
-                        weight = playerInfoOther.get(3).text().split(":")[1];
-                        weight = weight.replaceAll("\\(?\\)?", "").toLowerCase();
-                    }
-
-                    final String infoString = position + "｜" + batpitch + "｜" + height + "/" + weight;
-
-                    if(getActivity() != null) {
-                        final String finalOptionalHtml = optionalHtml;
-
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Glide.with(getContext()).load(headURL).centerCrop().into((ImageView)view.findViewById(R.id.headImageView));
-                                Glide.with(getContext()).load(gameURL).placeholder(R.drawable.launch_screen).into((ImageView)view.findViewById(R.id.gameImageView));
-
-                                if(!finalOptionalHtml.isEmpty()) {
-                                    view.findViewById(R.id.optionalView).setVisibility(View.VISIBLE);
-                                    ((WebView)view.findViewById(R.id.optionalWebView)).loadData(finalOptionalHtml, "text/html; charset=utf-8", "UTF-8");
-                                }
-
-                                ((WebView)view.findViewById(R.id.statsWebView)).loadData(statsHtml, "text/html; charset=utf-8", "UTF-8");
-                                ((WebView)view.findViewById(R.id.fieldingWebView)).loadData(fieldHtml, "text/html; charset=utf-8", "UTF-8");
-                                ((WebView)view.findViewById(R.id.teamStatsWebView)).loadData(teamHtml, "text/html; charset=utf-8", "UTF-8");
-                                ((WebView)view.findViewById(R.id.singleGameWebView)).loadData(singleHtml, "text/html; charset=utf-8", "UTF-8");
-
-                                ((TextView)view.findViewById(R.id.nameTextView)).setText(playerInfo);
-                                ((TextView)view.findViewById(R.id.dataTextView)).setText(infoString);
-
-                                final String titleString = (view.findViewById(R.id.optionalView).getVisibility() == View.GONE)? ((playerData[1] == "0")?"打擊成績":"投球成績") : "打擊成績";
-                                ((TextView)view.findViewById(R.id.statsTextView)).setText(titleString);
-                                ((MainActivity)getActivity()).hideProgressDialog();
-                            }
-                        });
-                    }
-                } catch (Exception e) {
-                    Log.d("error:", e.toString());
-
-                    if(getActivity() != null) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
-                                    ((MainActivity) getActivity()).hideProgressDialog();
-                                    Toast.makeText(getContext(), "發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
-                                }
-                            }
-                        });
-                    }
+            @Override
+            public void onReceivedError(WebView view, int errorCode,String description, String failingUrl) {
+                super.onReceivedError(view, errorCode, description, failingUrl);
+                if (getActivity() != null) {
+                    ((MainActivity)getActivity()).hideProgressDialog();
                 }
             }
         });
-    }
 
+        playerWebView.getSettings().setJavaScriptEnabled(true);
+        playerWebView.setScrollContainer(true);
+        playerWebView.bringToFront();
+        playerWebView.setScrollbarFadingEnabled(true);
+        playerWebView.setVerticalScrollBarEnabled(true);
+        playerWebView.setHorizontalScrollBarEnabled(true);
+        playerWebView.getSettings().setUseWideViewPort(true);
+        playerWebView.setVisibility(View.INVISIBLE);
+        playerWebView.loadUrl(this.getString(R.string.CPBLSourceURL) + playerData[0]);
+    }
 }

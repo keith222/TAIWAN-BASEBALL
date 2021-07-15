@@ -3,6 +3,8 @@ package org.sparkr.taiwan_baseball;
 
 import android.content.Context;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -12,7 +14,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,7 +42,7 @@ import okhttp3.Response;
  */
 public class StatisticsFragment extends Fragment {
 
-    private OkHttpClient client = new OkHttpClient();
+    private OkHttpClient client;
     private List<Stats> statsList;
     private List<Stats> battingStats;
     private List<Stats> pitchingStats;
@@ -77,6 +78,7 @@ public class StatisticsFragment extends Fragment {
         pitchingStats = new ArrayList<>();
         statsList = new ArrayList<>();
         adapter = new StatisticsAdapter(battingStats);
+        client = Utils.getUnsafeOkHttpClient().build();
         fetchStats();
     }
 
@@ -86,119 +88,98 @@ public class StatisticsFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_statistics, container, false);
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.statisticsRecyclerView);
+        recyclerView = view.findViewById(R.id.statisticsRecyclerView);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
 
-        SegmentedGroup segmentedGroup = (SegmentedGroup) view.findViewById(R.id.statsSegmented);
-        segmentedGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+        SegmentedGroup segmentedGroup = view.findViewById(R.id.statsSegmented);
+        segmentedGroup.setOnCheckedChangeListener((radioGroup, i) -> {
 
-                switch (i) {
-                    case R.id.batButton:
-                        adapter.stats = battingStats;
-                        adapter.notifyDataSetChanged();
-                        type = "0";
-                        break;
-                    case R.id.pitchButton:
-                        adapter.stats = pitchingStats;
-                        adapter.notifyDataSetChanged();
-                        type = "1";
-                        break;
-                }
+            switch (i) {
+                case R.id.batButton:
+                    adapter.stats = battingStats;
+                    adapter.notifyDataSetChanged();
+                    type = "0";
+                    break;
+                case R.id.pitchButton:
+                    adapter.stats = pitchingStats;
+                    adapter.notifyDataSetChanged();
+                    type = "1";
+                    break;
             }
         });
         return view;
     }
 
     private void fetchStats() {
-        Request request = new Request.Builder().url(this.getString(R.string.CPBLSourceURL) + "stats/toplist.html").build();
-        Call mcall = client.newCall(request);
-        mcall.enqueue(new Callback() {
+        Request request = new Request.Builder().url(this.getString(R.string.CPBLSourceURL) + "/stats/toplist").build();
+        Call mCall = client.newCall(request);
+        mCall.enqueue(new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 if(getContext() != null && getActivity() != null) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
-                                ((MainActivity) getActivity()).hideProgressDialog();
-                                Toast.makeText(getContext(), "統計資料錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
-                            }
+                    getActivity().runOnUiThread(() -> {
+                        if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
+                            ((MainActivity) getActivity()).hideProgressDialog();
+                            Log.e("=====", e.getLocalizedMessage());
+                            Toast.makeText(getContext(), "統計資料錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
                     });
                 }
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                final String resStr = response.body().string();
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                final String resStr = (response.body() != null) ? response.body().string() : "";
                 try {
                     Document doc = Jsoup.parse(resStr);
-                    Elements statsNodes = doc.select(".statstoplist_box");
+                    Elements statsNodes = doc.select(".TopFiveList div.item");
 
                     for(Element statsNode: statsNodes) {
-
                         String category = getCategory(statsNodes.indexOf(statsNode));
 
-                        List<String> statsElement = new ArrayList<>();
-                        Element tag = statsNode.select("table tr").get(1);
-
-                        Elements nodes = tag.select("td");
-
-                        for(Element node: nodes) {
-                            if(nodes.indexOf(node) == 0) { continue; }
-                            statsElement.add(node.text());
-                        }
-
-                        String moreURL = statsNode.select(".more_row").attr("href").toString();
-                        statsList.add(new Stats(statsElement.get(0), statsElement.get(1), statsElement.get(2), category, moreURL));
+                        Elements topPlayerNode = statsNode.select("ul li:first-child");
+                        String[] playerData = topPlayerNode.select(".player").text().trim().replace(")", "").split("\\(");
+                        String stats = topPlayerNode.select(".num").text().trim();
+                        String moreURL = statsNode.select(".btn_more a").attr("href");
+                        statsList.add(new Stats(playerData[1], playerData[0], stats, category, moreURL));
                     }
 
                     battingStats.add(statsList.get(0));
                     battingStats.add(statsList.get(1));
                     battingStats.add(statsList.get(2));
-                    battingStats.add(statsList.get(6));
-                    battingStats.add(statsList.get(7));
-                    battingStats.add(statsList.get(10));
+                    battingStats.add(statsList.get(3));
+                    battingStats.add(statsList.get(4));
 
-                    pitchingStats.add(statsList.get(3));
-                    pitchingStats.add(statsList.get(4));
                     pitchingStats.add(statsList.get(5));
+                    pitchingStats.add(statsList.get(6));
+                    pitchingStats.add(statsList.get(7));
                     pitchingStats.add(statsList.get(8));
                     pitchingStats.add(statsList.get(9));
-                    pitchingStats.add(statsList.get(11));
 
-                    adapter.setOnClick(new StatisticsAdapter.OnItemClicked(){
-                        @Override
-                        public void onItemClick(int position) {
-                            List<String> moreData = new ArrayList<>();
-                            moreData.add(((Integer.parseInt(type) == 0)? battingStats:pitchingStats).get(position).getMoreUrl());
-                            moreData.add(((Integer.parseInt(type) == 0)? battingStats:pitchingStats).get(position).getCategory());
-                            moreData.add(type);
+                    adapter.setOnClick(position -> {
+                        ArrayList<String> moreData = new ArrayList<>();
+                        moreData.add(((Integer.parseInt(type) == 0)? battingStats:pitchingStats).get(position).getMoreUrl());
+                        moreData.add(((Integer.parseInt(type) == 0)? battingStats:pitchingStats).get(position).getCategory());
+                        moreData.add(type);
 
-                            Fragment statsListFragment = new StatsListFragment();
-                            FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                            Bundle bundle = new Bundle();
-                            bundle.putStringArrayList("moreData", (ArrayList<String>) moreData);
-                            statsListFragment.setArguments(bundle);
-                            transaction.replace(R.id.fragment_statistics_container, statsListFragment, "StatsListFragment");
-                            transaction.addToBackStack(null);
-                            transaction.commit();
-                        }
+                        Fragment statsListFragment = new StatsListFragment();
+                        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+                        Bundle bundle = new Bundle();
+                        bundle.putStringArrayList("moreData", moreData);
+                        statsListFragment.setArguments(bundle);
+                        transaction.replace(R.id.fragment_statistics_container, statsListFragment, "StatsListFragment");
+                        transaction.addToBackStack(null);
+                        transaction.commit();
                     });
 
-                    recyclerView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            adapter.notifyDataSetChanged();
+                    recyclerView.post(() -> {
+                        adapter.notifyDataSetChanged();
 
-                            if (getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
-                                ((MainActivity)getActivity()).hideProgressDialog();
-                            }
+                        if (getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
+                            ((MainActivity)getActivity()).hideProgressDialog();
                         }
                     });
 
@@ -218,23 +199,19 @@ public class StatisticsFragment extends Fragment {
             case 2:
                 return "HR";
             case 3:
-                return "ERA";
-            case 4:
-                return "W";
-            case 5:
-                return "SV";
-            case 6:
                 return "RBI";
-            case 7:
+            case 4:
                 return "SB";
+            case 5:
+                return "ERA";
+            case 6:
+                return "W";
+            case 7:
+                return "SV";
             case 8:
-                return "SO";
-            case 9:
-                return "WHIP";
-            case 10:
-                return "TB";
-            case 11:
                 return "HLD";
+            case 9:
+                return "SO";
             default:
                 return "";
         }
@@ -253,7 +230,7 @@ public class StatisticsFragment extends Fragment {
             this.stats = stats;
         }
 
-        public class ViewHolder extends RecyclerView.ViewHolder {
+        public static class ViewHolder extends RecyclerView.ViewHolder {
 
             private final TextView categoryTextView;
             private final TextView statsNameTextView;
@@ -264,20 +241,20 @@ public class StatisticsFragment extends Fragment {
             public ViewHolder(View itemView) {
                 super(itemView);
 
-                categoryTextView = (TextView) itemView.findViewById(R.id.categoryTextView);
-                statsNameTextView = (TextView) itemView.findViewById(R.id.statsNameTextView);
-                statsTeamTextView = (TextView) itemView.findViewById(R.id.statsTeamTextView);
-                statsTextView = (TextView) itemView.findViewById(R.id.statsTextView);
+                categoryTextView = itemView.findViewById(R.id.categoryTextView);
+                statsNameTextView = itemView.findViewById(R.id.statsNameTextView);
+                statsTeamTextView = itemView.findViewById(R.id.statsTeamTextView);
+                statsTextView = itemView.findViewById(R.id.statsTextView);
             }
         }
 
+        @NonNull
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             Context context = parent.getContext();
             View view = LayoutInflater.from(context).inflate(R.layout.stats_list, parent, false);
-            ViewHolder viewHolder = new ViewHolder(view);
 
-            return viewHolder;
+            return new ViewHolder(view);
         }
 
         @Override
@@ -288,12 +265,7 @@ public class StatisticsFragment extends Fragment {
             holder.statsTeamTextView.setText(statsData.getTeam());
             holder.statsTextView.setText(statsData.getStats());
             holder.moreURL = statsData.getMoreUrl();
-            holder.itemView.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View v) {
-                    onClick.onItemClick(position);
-                }
-            });
+            holder.itemView.setOnClickListener(v -> onClick.onItemClick(position));
         }
 
         @Override

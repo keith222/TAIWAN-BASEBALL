@@ -2,12 +2,13 @@ package org.sparkr.taiwan_baseball;
 
 import android.content.Context;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +26,7 @@ import org.sparkr.taiwan_baseball.Model.StatsList;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 import okhttp3.Call;
@@ -40,14 +41,14 @@ import okhttp3.Response;
  */
 public class StatsListFragment extends Fragment {
 
-    private OkHttpClient client = new OkHttpClient();
+    private OkHttpClient client;
     private List<StatsList> statslistList;
     private List<String> moreData;
     private RecyclerView recyclerView;
     private StatsListAdapter adapter;
     private int totalPage = 1;
     private int page = 1;
-    private int visibleThreshold = 4;
+    private final int visibleThreshold = 4;
     private boolean isLoading = false;
     int lastVisibleItem, totalItemCount;
 
@@ -63,12 +64,13 @@ public class StatsListFragment extends Fragment {
             moreData = getArguments().getStringArrayList("moreData");
         }
 
-        if(!((MainActivity)getActivity()).isShowingProgressDialog() && getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
+        if(getActivity() != null && !((MainActivity)getActivity()).isShowingProgressDialog() && !((MainActivity)getContext()).isFinishing()) {
             ((MainActivity) getActivity()).showProgressDialog();
         }
 
         statslistList = new ArrayList<>();
         adapter = new StatsListAdapter(statslistList);
+        client = Utils.getUnsafeOkHttpClient().build();
         fetchStatsList(page);
     }
 
@@ -85,7 +87,7 @@ public class StatsListFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_statslist, container, false);
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.statsListRecyclerView);
+        recyclerView = view.findViewById(R.id.statsListRecyclerView);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
@@ -95,7 +97,7 @@ public class StatsListFragment extends Fragment {
             public Boolean isScrolled = false;
 
             @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
 
                 if(newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
@@ -104,7 +106,7 @@ public class StatsListFragment extends Fragment {
             }
 
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
 
                 if(!isScrolled) { return; }
@@ -115,12 +117,9 @@ public class StatsListFragment extends Fragment {
                 if (!isLoading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
                     page++;
                     if(page <= totalPage) {
-                        recyclerView.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                statslistList.add(null);
-                                adapter.notifyItemInserted(statslistList.size() - 1);
-                            }
+                        recyclerView.post(() -> {
+                            statslistList.add(null);
+                            adapter.notifyItemInserted(statslistList.size() - 1);
                         });
 
                         fetchStatsList(page);
@@ -146,10 +145,10 @@ public class StatsListFragment extends Fragment {
     }
 
     @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
+    public void setMenuVisibility(boolean menuVisible) {
+        super.setMenuVisibility(menuVisible);
 
-        if (isVisibleToUser) {
+        if (menuVisible) {
             setActionBar();
         }
     }
@@ -165,84 +164,79 @@ public class StatsListFragment extends Fragment {
     }
 
     public void fetchStatsList(final int newPage) {
-        String route = moreData.get(0).substring(1);
+        String route = moreData.get(0);
         final String category = moreData.get(1);
+        int month = Calendar.getInstance().get(Calendar.MONTH) + 1;
+        int year = Calendar.getInstance().get(Calendar.YEAR) - ((month < 3) ? 1 : 0);
 
-        Request request = new Request.Builder().url(this.getString(R.string.CPBLSourceURL) + route + "&per_page=" + Integer.toString(newPage)).build();
-        Call mcall = client.newCall(request);
-        mcall.enqueue(new Callback() {
+        Request request = new Request.Builder().url(this.getString(R.string.CPBLSourceURL) + route + "&page=" + newPage + "&year=" + year).build();
+        Call mCall = client.newCall(request);
+        mCall.enqueue(new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 if(getContext() != null && getActivity() != null) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
-                                ((MainActivity) getActivity()).hideProgressDialog();
-                                Toast.makeText(getContext(), "統計資料發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
-                            }
+                    getActivity().runOnUiThread(() -> {
+                        if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
+                            ((MainActivity) getActivity()).hideProgressDialog();
+                            Toast.makeText(getContext(), "統計資料發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
                     });
                 }
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                final String resStr = response.body().string();
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                final String resStr = (response.body() != null) ? response.body().string() : "";
                 try {
                     Document doc = Jsoup.parse(resStr);
-                    final Elements nodes = doc.select(".std_tb tr");
 
+                    final Elements nodes = doc.select(".RecordTable tr");
                     for(Element node: nodes) {
                         if(nodes.indexOf(node) == 0) { continue; }
 
                         int categoryIndex = getCategoryIndex(category);
-                        String numData = node.select("td").get(0).text();
-                        String[] nameDataArray = node.select("td").get(1).text().replace("*","").trim().split(" ");
-                        String nameData = TextUtils.join(" ", Arrays.copyOfRange(nameDataArray, 1, nameDataArray.length));
-                        String teamData = getTeam(node.select("td").get(1).select("img").attr("src").toString());
-                        String statsData = node.select("td").get(categoryIndex).text();
-                        String playerURLData = node.select("td").get(1).select("a").attr("href").toString();
+
+                        String numData = node.select(".rank").text();
+                        Elements player = node.select("td .name a");
+                        String nameData = player.text();
+                        String[] teamDataArray = node.select("td .team_logo a").attr("href").split("=");
+                        String teamData = getTeam(teamDataArray[teamDataArray.length - 1]);
+                        String statsData = node.select("td.num").get(categoryIndex - 1).text();
+                        String playerURLData = player.attr("href");
 
                         statslistList.add(new StatsList(numData, nameData, teamData, statsData, playerURLData));
                     }
 
-                    if(!doc.select("a.page:nth-last-child(2)").text().isEmpty()) {
-                        totalPage = Integer.parseInt(doc.select("a.page:nth-last-child(2)").text());
+                    if(!doc.select(".setting").text().split("/")[0].replaceAll("[^\\d]", "").isEmpty()) {
+                        totalPage = Integer.parseInt(doc.select(".setting").text().split("/")[0].replaceAll("[^\\d]", ""));
                     }
 
-                    adapter.setOnClick(new StatsListAdapter.OnItemClicked(){
-                        @Override
-                        public void onItemClick(int position) {
-                            ((MainActivity)getActivity()).setTempTitle(category);
-                            String[] playerData = new String[]{statslistList.get(position).getPlayerUrl(), moreData.get(2)};
+                    adapter.setOnClick(position -> {
+                        ((MainActivity)getActivity()).setTempTitle(category);
+                        String[] playerData = new String[]{statslistList.get(position).getPlayerUrl(), moreData.get(2)};
 
-                            Fragment playerFragment = new PlayerFragment();
-                            Bundle bundle = new Bundle();
-                            bundle.putStringArray("playerData", playerData);
-                            playerFragment.setArguments(bundle);
-                            FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                            transaction.add(R.id.fragment_statslist_container, playerFragment, "PlayerFragment");
-                            transaction.addToBackStack(null);
-                            transaction.commit();
-                        }
+                        Fragment playerFragment = new PlayerFragment();
+                        Bundle bundle = new Bundle();
+                        bundle.putStringArray("playerData", playerData);
+                        playerFragment.setArguments(bundle);
+                        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+                        transaction.add(R.id.fragment_statslist_container, playerFragment, "PlayerFragment");
+                        transaction.addToBackStack(null);
+                        transaction.commit();
                     });
 
-                    recyclerView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            adapter.notifyDataSetChanged();
+                    recyclerView.post(() -> {
+                        adapter.notifyDataSetChanged();
 
-                            if((statslistList.size() - nodes.size()) > 0) {
-                                statslistList.remove(statslistList.size() - nodes.size());
-                                adapter.notifyItemRemoved(statslistList.size());
-                            }
+                        if((statslistList.size() - nodes.size()) > 0) {
+                            statslistList.remove(statslistList.size() - nodes.size());
+                            adapter.notifyItemRemoved(statslistList.size());
+                        }
 
-                            setLoaded();
+                        setLoaded();
 
-                            if (getActivity() != null) {
-                                ((MainActivity)getActivity()).hideProgressDialog();
-                            }
+                        if (getActivity() != null) {
+                            ((MainActivity)getActivity()).hideProgressDialog();
                         }
                     });
 
@@ -254,20 +248,16 @@ public class StatsListFragment extends Fragment {
     }
 
     private String getTeam(String fileName){
-        if(fileName.contains("B03")){
-            return "義大犀牛";
-        }else if(fileName.contains("A02")) {
-            return "Lamigo";
-        }else if(fileName.contains("AJL011")) {
-            return "樂天";
-        }else if(fileName.contains("E02")){
+        if (fileName.contains("ADD011")) {
+            return "統一7-ELEVEn獅";
+        } else if (fileName.contains("ACN011")) {
             return "中信兄弟";
-        }else if(fileName.contains("L01")){
-            return "統一獅";
-        }else if(fileName.contains("B04")){
-            return "富邦";
-        }else if(fileName.contains("D01")) {
-            return "味全";
+        } else if (fileName.contains("AJL011")) {
+            return "樂天桃猿";
+        } else if (fileName.contains("AEO011")) {
+            return "富邦悍將";
+        } else if (fileName.contains("AAA011")) {
+            return "味全龍";
         }
 
         return "無";
@@ -276,29 +266,23 @@ public class StatsListFragment extends Fragment {
     private int getCategoryIndex(String category){
         switch (category) {
             case "AVG":
-                return 17;
+            case "ERA":
+                return 1;
             case "H":
+            case "W":
                 return 7;
             case "HR":
                 return 11;
-            case "ERA":
-                return 15;
-            case "W":
-                return 8;
-            case "SV":
-                return 10;
             case "RBI":
                 return 5;
             case "SB":
                 return 14;
-            case "SO":
-                return 23;
-            case "WHIP":
-                return 14;
-            case "TB":
-                return 12;
+            case "SV":
+                return 9;
             case "HLD":
-                return 12;
+                return 10;
+            case "SO":
+                return 21;
             default:
                 return 0;
         }
@@ -306,7 +290,7 @@ public class StatsListFragment extends Fragment {
 
     public static class StatsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-        private List<StatsList> statsList;
+        private final List<StatsList> statsList;
         private OnItemClicked onClick;
 
         public interface OnItemClicked {
@@ -317,7 +301,7 @@ public class StatsListFragment extends Fragment {
             this.statsList = statsList;
         }
 
-        public class StatsListViewHolder extends RecyclerView.ViewHolder {
+        public static class StatsListViewHolder extends RecyclerView.ViewHolder {
 
             private final TextView numTextView;
             private final TextView nameTextView;
@@ -328,39 +312,38 @@ public class StatsListFragment extends Fragment {
             public StatsListViewHolder(View itemView) {
                 super(itemView);
 
-                numTextView = (TextView) itemView.findViewById(R.id.numTextView);
-                nameTextView = (TextView) itemView.findViewById(R.id.nameTextView);
-                teamTextView = (TextView) itemView.findViewById(R.id.teamTextView);
-                statsTextView = (TextView) itemView.findViewById(R.id.statsTextView);
+                numTextView = itemView.findViewById(R.id.numTextView);
+                nameTextView = itemView.findViewById(R.id.nameTextView);
+                teamTextView = itemView.findViewById(R.id.teamTextView);
+                statsTextView = itemView.findViewById(R.id.statsTextView);
             }
         }
 
-        public class LoadingViewHolder extends RecyclerView.ViewHolder {
+        public static class LoadingViewHolder extends RecyclerView.ViewHolder {
             public ProgressBar progressBar;
 
             public LoadingViewHolder(View view) {
                 super(view);
-                progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+                progressBar = view.findViewById(R.id.progressBar);
             }
         }
 
+        @NonNull
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             Context context = parent.getContext();
             if(viewType == 0) {
                 View view = LayoutInflater.from(context).inflate(R.layout.statslist_list, parent, false);
-                StatsListViewHolder statsListViewHolder = new StatsListViewHolder(view);
-                return statsListViewHolder;
+                return new StatsListViewHolder(view);
 
             } else {
                 View view = LayoutInflater.from(context).inflate(R.layout.item_loading, parent, false);
-                LoadingViewHolder loadingViewHolder = new LoadingViewHolder(view);
-                return loadingViewHolder;
+                return new LoadingViewHolder(view);
             }
         }
 
         @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
             if(holder instanceof StatsListViewHolder) {
                 StatsList statslistData = statsList.get(position);
                 StatsListViewHolder statsListViewHolder = (StatsListViewHolder)holder;
@@ -368,12 +351,7 @@ public class StatsListFragment extends Fragment {
                 statsListViewHolder.nameTextView.setText(statslistData.getName());
                 statsListViewHolder.teamTextView.setText(statslistData.getTeam());
                 statsListViewHolder.statsTextView.setText(statslistData.getStats());
-                statsListViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        onClick.onItemClick(position);
-                    }
-                });
+                statsListViewHolder.itemView.setOnClickListener(v -> onClick.onItemClick(position));
             } else if(holder instanceof LoadingViewHolder) {
                 LoadingViewHolder loadingViewHolder = (LoadingViewHolder)holder;
                 loadingViewHolder.progressBar.setIndeterminate(true);
