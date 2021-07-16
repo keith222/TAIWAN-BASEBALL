@@ -128,4 +128,71 @@ public class Utils {
             return "Taiwan Series G" + (-game);
         }
     }
+
+    public static String getTeam(String fileName){
+        if (fileName.contains("ADD011")) {
+            return "統一7-ELEVEn獅";
+        } else if (fileName.contains("ACN011")) {
+            return "中信兄弟";
+        } else if (fileName.contains("AJL011")) {
+            return "樂天桃猿";
+        } else if (fileName.contains("AEO011")) {
+            return "富邦悍將";
+        } else if (fileName.contains("AAA011")) {
+            return "味全龍";
+        }
+
+        return "無";
+    }
+
+    public static int getCategoryIndex(String category){
+        switch (category) {
+            case "AVG":
+            case "ERA":
+                return 1;
+            case "H":
+            case "W":
+                return 7;
+            case "HR":
+                return 11;
+            case "RBI":
+                return 6;
+            case "SB":
+            case "21":
+                return 21;
+            case "SV":
+                return 9;
+            case "HLD":
+                return 10;
+            default:
+                return 0;
+        }
+    }
+
+    public static String getCategory(int index) {
+        switch (index) {
+            case 0:
+                return "AVG";
+            case 1:
+                return "H";
+            case 2:
+                return "HR";
+            case 3:
+                return "RBI";
+            case 4:
+                return "SB";
+            case 5:
+                return "ERA";
+            case 6:
+                return "W";
+            case 7:
+                return "SV";
+            case 8:
+                return "HLD";
+            case 9:
+                return "SO";
+            default:
+                return "";
+        }
+    }
 }

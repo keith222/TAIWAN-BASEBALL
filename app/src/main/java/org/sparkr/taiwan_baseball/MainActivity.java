@@ -1,6 +1,8 @@
 package org.sparkr.taiwan_baseball;
 
 import android.app.ProgressDialog;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -11,20 +13,10 @@ import androidx.viewpager.widget.ViewPager;
 import android.os.Bundle;
 
 import com.google.android.material.tabs.TabLayout;
-import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    /**
-     * The  androidx.core.view.PagerAdapter that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * androidx.core.app.FragmentStatePagerAdapter.
-     */
-    private SectionsPagerAdapter mSectionsPagerAdapter;
     private ProgressDialog progressDialog;
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -82,7 +74,15 @@ public class MainActivity extends AppCompatActivity {
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        /**
+         * The  androidx.core.view.PagerAdapter that will provide
+         * fragments for each of the sections. We use a
+         * {@link FragmentPagerAdapter} derivative, which will keep every
+         * loaded fragment in memory. If this becomes too memory intensive, it
+         * may be best to switch to a
+         * androidx.core.app.FragmentStatePagerAdapter.
+         */
+        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = findViewById(R.id.container);
@@ -154,7 +154,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setPagingEnabled(boolean value) {
-        mViewPager.setPagingEnabled(value);
+        if (mViewPager != null) {
+            mViewPager.setPagingEnabled(value);
+        }
     }
 
     public boolean isShowingProgressDialog() {
@@ -206,6 +208,7 @@ public class MainActivity extends AppCompatActivity {
             super(fm);
         }
 
+        @NonNull
         @Override
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.

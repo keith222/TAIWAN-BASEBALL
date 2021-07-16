@@ -89,7 +89,7 @@ public class VideoFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_video, container, false);
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.videoRecyclerView);
+        recyclerView = view.findViewById(R.id.videoRecyclerView);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
@@ -213,6 +213,10 @@ public class VideoFragment extends Fragment {
                     });
 
                 } catch (Exception e) {
+                    if (getActivity() != null) {
+                        ((MainActivity)getActivity()).hideProgressDialog();
+                    }
+
                     Log.d("error:", e.toString());
                 }
             }
@@ -281,7 +285,7 @@ public class VideoFragment extends Fragment {
                 videoViewHolder.videoTitleTextView.setText(videoData.getSnippet().getVideoTitle());
                 videoViewHolder.videoId = videoData.getId().getVideoId();
                 videoViewHolder.videoDateTextView.setText(videoData.getSnippet().getVideoDate().substring(0, 10).replace("-", "."));
-                Glide.with(videoViewHolder.videoImageView.getContext()).load(videoData.getSnippet().getThumbnails().getHigh().getVideoImageUrl()).centerCrop().into(videoViewHolder.videoImageView);
+                Glide.with(videoViewHolder.videoImageView.getContext()).load(videoData.getSnippet().getThumbnails().getHigh().getVideoImageUrl()).centerCrop().error(R.mipmap.logo).centerCrop().into(videoViewHolder.videoImageView);
 
 
                 videoViewHolder.videoImageView.setOnClickListener(new View.OnClickListener() {

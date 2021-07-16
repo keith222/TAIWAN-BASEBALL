@@ -226,6 +226,10 @@ public class NewsFragment extends Fragment {
                     });
 
                 } catch (Exception e) {
+                    if (getActivity() != null) {
+                        ((MainActivity)getActivity()).hideProgressDialog();
+                    }
+
                     Log.d("error:", e.toString());
                 }
             }

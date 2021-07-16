@@ -21,7 +21,6 @@ import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection;
 
 public class DateSelectionActivity extends AppCompatActivity {
 
-    private RecyclerView recyclerView;
     private SectionedRecyclerViewAdapter adapter;
     private int year = 0;
     private int month = 0;
@@ -30,7 +29,7 @@ public class DateSelectionActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_date_selection);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setTitle("選擇年月");
@@ -41,18 +40,16 @@ public class DateSelectionActivity extends AppCompatActivity {
         adapter.addSection(new YearMonthSection("選擇年份", addItemList(0)));
         adapter.addSection(new YearMonthSection("選擇月份", addItemList(1)));
 
-        recyclerView = (RecyclerView) findViewById(R.id.dateSelectionRecyclerView);
+        RecyclerView recyclerView = findViewById(R.id.dateSelectionRecyclerView);
         final GridLayoutManager layoutManager = new GridLayoutManager(this, 4);
 
         layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
-                switch (adapter.getSectionItemViewType(position)) {
-                    case SectionedRecyclerViewAdapter.VIEW_TYPE_HEADER:
-                        return 4;
-                    default:
-                        return 1;
+                if (adapter.getSectionItemViewType(position) == SectionedRecyclerViewAdapter.VIEW_TYPE_HEADER) {
+                    return 4;
                 }
+                return 1;
             }
         });
         recyclerView.setLayoutManager(layoutManager);
@@ -61,10 +58,9 @@ public class DateSelectionActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -96,13 +92,13 @@ public class DateSelectionActivity extends AppCompatActivity {
 
     private class YearMonthSection extends StatelessSection {
 
-        private String title;
-        private List<String> yearMonthList;
+        private final String title;
+        private final List yearMonthList;
         private int selectedPosition = -1;
-        private int size;
+        private final int size;
 
         public YearMonthSection(String title, List yearMonthList) {
-            super(new SectionParameters.Builder(R.layout.year_month_list).headerResourceId(R.layout.calendar_head).build());
+            super(SectionParameters.builder().itemResourceId(R.layout.year_month_list).headerResourceId(R.layout.calendar_head).build());
             this.title = title;
             this.yearMonthList = yearMonthList;
             this.size = yearMonthList.size();
@@ -120,7 +116,7 @@ public class DateSelectionActivity extends AppCompatActivity {
         public void onBindItemViewHolder(RecyclerView.ViewHolder holder, final int position) {
             final ItemViewHolder itemHolder = (ItemViewHolder) holder;
 
-            final String yearMonth = yearMonthList.get(position);
+            final String yearMonth = (String) yearMonthList.get(position);
             itemHolder.yearMonthTextView.setText(yearMonth);
             if (selectedPosition == position) {
                 itemHolder.itemView.setBackgroundColor(getResources().getColor(R.color.lighterCPBLBlue));
@@ -128,20 +124,17 @@ public class DateSelectionActivity extends AppCompatActivity {
                 itemHolder.itemView.setBackgroundColor(0);
             }
 
-            itemHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (selectedPosition == position) { return; }
-                    selectedPosition = position;
+            itemHolder.itemView.setOnClickListener(v -> {
+                if (selectedPosition == position) { return; }
+                selectedPosition = position;
 
-                    if (size == 10) {
-                        month = 2 + position;
-                    } else {
-                        year = 1990 + position;
-                    }
-                    adapter.notifyDataSetChanged();
-                    if (year != 0 && month != 0 ) {sendDataBack(year, month);}
+                if (size == 10) {
+                    month = 2 + position;
+                } else {
+                    year = 1990 + position;
                 }
+                adapter.notifyDataSetChanged();
+                if (year != 0 && month != 0 ) {sendDataBack(year, month);}
             });
 
 
@@ -160,25 +153,25 @@ public class DateSelectionActivity extends AppCompatActivity {
         }
     }
 
-    private class HeaderViewHolder extends RecyclerView.ViewHolder {
+    private static class HeaderViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView gameDateTextView;
 
         HeaderViewHolder(View view) {
             super(view);
 
-            gameDateTextView = (TextView) view.findViewById(R.id.gameDateTextView);
+            gameDateTextView = view.findViewById(R.id.gameDateTextView);
         }
     }
 
-    private class ItemViewHolder extends RecyclerView.ViewHolder {
+    private static class ItemViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView yearMonthTextView;
 
         public ItemViewHolder(View itemView) {
             super(itemView);
 
-            yearMonthTextView = (TextView) itemView.findViewById(R.id.yearMonthTextView);
+            yearMonthTextView = itemView.findViewById(R.id.yearMonthTextView);
         }
     }
 

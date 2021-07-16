@@ -194,13 +194,13 @@ public class StatsListFragment extends Fragment {
                     for(Element node: nodes) {
                         if(nodes.indexOf(node) == 0) { continue; }
 
-                        int categoryIndex = getCategoryIndex(category);
+                        int categoryIndex = Utils.getCategoryIndex(category);
 
                         String numData = node.select(".rank").text();
                         Elements player = node.select("td .name a");
                         String nameData = player.text();
                         String[] teamDataArray = node.select("td .team_logo a").attr("href").split("=");
-                        String teamData = getTeam(teamDataArray[teamDataArray.length - 1]);
+                        String teamData = Utils.getTeam(teamDataArray[teamDataArray.length - 1]);
                         String statsData = node.select("td.num").get(categoryIndex - 1).text();
                         String playerURLData = player.attr("href");
 
@@ -228,7 +228,7 @@ public class StatsListFragment extends Fragment {
                     recyclerView.post(() -> {
                         adapter.notifyDataSetChanged();
 
-                        if((statslistList.size() - nodes.size()) > 0) {
+                        if(((statslistList.size() - nodes.size()) > 0) && ((statslistList.size() - nodes.size() < statslistList.size()))) {
                             statslistList.remove(statslistList.size() - nodes.size());
                             adapter.notifyItemRemoved(statslistList.size());
                         }
@@ -241,51 +241,14 @@ public class StatsListFragment extends Fragment {
                     });
 
                 } catch (Exception e) {
+                    if (getActivity() != null) {
+                        ((MainActivity)getActivity()).hideProgressDialog();
+                    }
+
                     Log.d("error:", e.toString());
                 }
             }
         });
-    }
-
-    private String getTeam(String fileName){
-        if (fileName.contains("ADD011")) {
-            return "統一7-ELEVEn獅";
-        } else if (fileName.contains("ACN011")) {
-            return "中信兄弟";
-        } else if (fileName.contains("AJL011")) {
-            return "樂天桃猿";
-        } else if (fileName.contains("AEO011")) {
-            return "富邦悍將";
-        } else if (fileName.contains("AAA011")) {
-            return "味全龍";
-        }
-
-        return "無";
-    }
-
-    private int getCategoryIndex(String category){
-        switch (category) {
-            case "AVG":
-            case "ERA":
-                return 1;
-            case "H":
-            case "W":
-                return 7;
-            case "HR":
-                return 11;
-            case "RBI":
-                return 5;
-            case "SB":
-                return 14;
-            case "SV":
-                return 9;
-            case "HLD":
-                return 10;
-            case "SO":
-                return 21;
-            default:
-                return 0;
-        }
     }
 
     public static class StatsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {

@@ -186,6 +186,10 @@ public class RankFragment extends Fragment {
                         onDataFetched();
 
                     } catch (Exception e) {
+                        if (getActivity() != null) {
+                            ((MainActivity)getActivity()).hideProgressDialog();
+                        }
+
                         Log.d("error:", e.getMessage());
                     }
                 }
@@ -276,6 +280,10 @@ public class RankFragment extends Fragment {
                     });
 
                 } catch (Exception e) {
+                    if (getActivity() != null) {
+                        ((MainActivity)getActivity()).hideProgressDialog();
+                    }
+
                     Log.d("error:", e.getMessage());
                 }
             }

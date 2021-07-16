@@ -3,6 +3,8 @@ package org.sparkr.taiwan_baseball;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -49,7 +51,6 @@ public class CalendarFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private SectionedRecyclerViewAdapter adapter;
-    private List tempList;
     private int year = 0;
     private int month = 0;
 
@@ -104,44 +105,38 @@ public class CalendarFragment extends Fragment {
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_calendar, container, false);
-        recyclerView = (RecyclerView) view.findViewById(R.id.gameRecyclerView);
+        recyclerView = view.findViewById(R.id.gameRecyclerView);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addItemDecoration(new DividerItemDecoration(this.getContext(), LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(adapter);
 
-        ImageButton forwardImageButton = (ImageButton) view.findViewById(R.id.forwardImageButton);
-        forwardImageButton.setOnClickListener(new ImageButton.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                month += 1;
-                if (month > 11) {
-                    year += 1;
-                    month = 2;
-                }
-                fetchGame(Integer.toString(year), Integer.toString(month));
+        ImageButton forwardImageButton = view.findViewById(R.id.forwardImageButton);
+        forwardImageButton.setOnClickListener(v -> {
+            month += 1;
+            if (month > 11) {
+                year += 1;
+                month = 2;
             }
+            fetchGame(Integer.toString(year), Integer.toString(month));
         });
 
-        ImageButton backImageButton = (ImageButton) view.findViewById(R.id.backImageButton);
-        backImageButton.setOnClickListener(new ImageButton.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                month -= 1;
-                if (month < 2) {
-                    year -= 1;
-                    month = 11;
-                }
-                fetchGame(Integer.toString(year), Integer.toString(month));
+        ImageButton backImageButton = view.findViewById(R.id.backImageButton);
+        backImageButton.setOnClickListener(v -> {
+            month -= 1;
+            if (month < 2) {
+                year -= 1;
+                month = 11;
             }
+            fetchGame(Integer.toString(year), Integer.toString(month));
         });
 
         return view;
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_main, menu);
     }
 
@@ -178,23 +173,19 @@ public class CalendarFragment extends Fragment {
         adapter.removeAllSections();
         adapter.notifyDataSetChanged();
 
-        tempList = new ArrayList<>();
         final Map<String, List<Game>> tempMap = new TreeMap<>();
 
         final DatabaseReference dataReference = FirebaseDatabase.getInstance().getReference().getRef().child(year).child(month);
 
         dataReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.getChildrenCount() < 1) {
                     if (getActivity() != null) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (getActivity() != null && !((MainActivity) getContext()).isFinishing()) {
-                                    ((MainActivity) getActivity()).hideProgressDialog();
-                                    Toast.makeText(getContext(), "未有比賽資料。", Toast.LENGTH_LONG).show();
-                                }
+                        getActivity().runOnUiThread(() -> {
+                            if (getActivity() != null && !((MainActivity) getContext()).isFinishing()) {
+                                ((MainActivity) getActivity()).hideProgressDialog();
+                                Toast.makeText(getContext(), "未有比賽資料。", Toast.LENGTH_LONG).show();
                             }
                         });
                     }
@@ -213,22 +204,19 @@ public class CalendarFragment extends Fragment {
                     tempMap.put(dataSnapshot.getKey(), gameList);
                     Calendar calendar = Calendar.getInstance();
                     calendar.set(Integer.parseInt(year), (Integer.parseInt(month) - 1), Integer.parseInt(snapshot.getKey()));
-                    ;
+
                     int weekDay = calendar.get(Calendar.DAY_OF_WEEK);
                     adapter.addSection(new GameSection(month + "月" + snapshot.getKey() + "日 " + getChineseWeekDay(weekDay), gameList));
 
                 }
 
                 if (recyclerView != null) {
-                    recyclerView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            ((TextView) getActivity().findViewById(R.id.calendarTextView)).setText(year + "年" + month + "月");
+                    recyclerView.post(() -> {
+                        ((TextView) getActivity().findViewById(R.id.calendarTextView)).setText(year + "年" + month + "月");
 
-                            adapter.notifyDataSetChanged();
-                            ((MainActivity) getActivity()).hideProgressDialog();
+                        adapter.notifyDataSetChanged();
+                        ((MainActivity) getActivity()).hideProgressDialog();
 
-                        }
                     });
                 }
 
@@ -236,28 +224,25 @@ public class CalendarFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(@NonNull DatabaseError databaseError) {
             }
 
         });
 
         dataReference.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
 
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, String s) {
                 if (dataSnapshot.getChildrenCount() < 1) {
                     if (getActivity() != null) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (getActivity() != null && !((MainActivity) getContext()).isFinishing()) {
-                                    ((MainActivity) getActivity()).hideProgressDialog();
-                                    Toast.makeText(getContext(), "未有比賽資料。", Toast.LENGTH_LONG).show();
-                                }
+                        getActivity().runOnUiThread(() -> {
+                            if (getActivity() != null && !((MainActivity) getContext()).isFinishing()) {
+                                ((MainActivity) getActivity()).hideProgressDialog();
+                                Toast.makeText(getContext(), "未有比賽資料。", Toast.LENGTH_LONG).show();
                             }
                         });
                     }
@@ -284,28 +269,25 @@ public class CalendarFragment extends Fragment {
                 section.addItem(gameList);
 
                 if (recyclerView != null) {
-                    recyclerView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            adapter.notifyDataSetChanged();
-                            ((MainActivity) getActivity()).hideProgressDialog();
-                        }
+                    recyclerView.post(() -> {
+                        adapter.notifyDataSetChanged();
+                        ((MainActivity) getActivity()).hideProgressDialog();
                     });
                 }
             }
 
             @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
 
             }
 
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, String s) {
 
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         });
 
@@ -334,11 +316,11 @@ public class CalendarFragment extends Fragment {
 
     private class GameSection extends StatelessSection {
 
-        private String title;
+        private final String title;
         private List<Game> gameList;
 
-        public GameSection(String title, List gameList) {
-            super(new SectionParameters.Builder(R.layout.calendar_list).headerResourceId(R.layout.calendar_head).build());
+        public GameSection(String title, List<Game> gameList) {
+            super(SectionParameters.builder().itemResourceId(R.layout.calendar_list).headerResourceId(R.layout.calendar_head).build());
             this.title = title;
             this.gameList = gameList;
         }
@@ -373,16 +355,13 @@ public class CalendarFragment extends Fragment {
             itemHolder.homeImageView.setImageResource(Utils.teamImageView(game.getHome()));
             itemHolder.placeTextView.setText(game.getPlace());
 
-            itemHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            itemHolder.itemView.setOnClickListener(v -> {
 
-                    Fragment gameFragment = GameFragment.newInstance(gameList.get(position));
-                    FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                    transaction.add(R.id.fragment_calendar_container, gameFragment, "GameFragment");
-                    transaction.addToBackStack(null);
-                    transaction.commit();
-                }
+                Fragment gameFragment = GameFragment.newInstance(gameList.get(position));
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                transaction.add(R.id.fragment_calendar_container, gameFragment, "GameFragment");
+                transaction.addToBackStack(null);
+                transaction.commit();
             });
         }
 
@@ -399,18 +378,18 @@ public class CalendarFragment extends Fragment {
         }
     }
 
-    private class HeaderViewHolder extends RecyclerView.ViewHolder {
+    private static class HeaderViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView gameDateTextView;
 
         HeaderViewHolder(View view) {
             super(view);
 
-            gameDateTextView = (TextView) view.findViewById(R.id.gameDateTextView);
+            gameDateTextView = view.findViewById(R.id.gameDateTextView);
         }
     }
 
-    private class ItemViewHolder extends RecyclerView.ViewHolder {
+    private static class ItemViewHolder extends RecyclerView.ViewHolder {
 
         private final ImageView guestImageView;
         private final TextView gameNumberTextView;
@@ -422,12 +401,12 @@ public class CalendarFragment extends Fragment {
         public ItemViewHolder(View itemView) {
             super(itemView);
 
-            guestImageView = (ImageView) itemView.findViewById(R.id.guestImageView);
-            gameNumberTextView = (TextView) itemView.findViewById(R.id.gameNumberTextView);
-            guestScoreTextView = (TextView) itemView.findViewById(R.id.guestScoreTextView);
-            homeScoreTextView = (TextView) itemView.findViewById(R.id.homeScoreTextView);
-            homeImageView = (ImageView) itemView.findViewById(R.id.homeImageView);
-            placeTextView = (TextView) itemView.findViewById(R.id.placeTextView);
+            guestImageView = itemView.findViewById(R.id.guestImageView);
+            gameNumberTextView = itemView.findViewById(R.id.gameNumberTextView);
+            guestScoreTextView = itemView.findViewById(R.id.guestScoreTextView);
+            homeScoreTextView = itemView.findViewById(R.id.homeScoreTextView);
+            homeImageView = itemView.findViewById(R.id.homeImageView);
+            placeTextView = itemView.findViewById(R.id.placeTextView);
         }
     }
 }

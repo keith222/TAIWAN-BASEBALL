@@ -138,13 +138,20 @@ public class StatisticsFragment extends Fragment {
                     Elements statsNodes = doc.select(".TopFiveList div.item");
 
                     for(Element statsNode: statsNodes) {
-                        String category = getCategory(statsNodes.indexOf(statsNode));
-
+                        String category = Utils.getCategory(statsNodes.indexOf(statsNode));
+                        int categoryIndex = Utils.getCategoryIndex(category);
                         Elements topPlayerNode = statsNode.select("ul li:first-child");
                         String[] playerData = topPlayerNode.select(".player").text().trim().replace(")", "").split("\\(");
                         String stats = topPlayerNode.select(".num").text().trim();
-                        String moreURL = statsNode.select(".btn_more a").attr("href");
+                        String moreURL = statsNode.select(".btn_more a").attr("href").replace("sortby=" + String.format("%02d", categoryIndex - 1), "sortby=" + String.format("%02d", categoryIndex));
                         statsList.add(new Stats(playerData[1], playerData[0], stats, category, moreURL));
+                    }
+
+                    if (statsList.size() != 10) {
+                        if (getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
+                            ((MainActivity)getActivity()).hideProgressDialog();
+                            return;
+                        }
                     }
 
                     battingStats.add(statsList.get(0));
@@ -184,37 +191,14 @@ public class StatisticsFragment extends Fragment {
                     });
 
                 } catch (Exception e) {
+                    if (getActivity() != null) {
+                        ((MainActivity)getActivity()).hideProgressDialog();
+                    }
+
                     Log.d("error:", e.toString());
                 }
             }
         });
-    }
-
-    private String getCategory(int index) {
-        switch (index) {
-            case 0:
-                return "AVG";
-            case 1:
-                return "H";
-            case 2:
-                return "HR";
-            case 3:
-                return "RBI";
-            case 4:
-                return "SB";
-            case 5:
-                return "ERA";
-            case 6:
-                return "W";
-            case 7:
-                return "SV";
-            case 8:
-                return "HLD";
-            case 9:
-                return "SO";
-            default:
-                return "";
-        }
     }
 
     public static class StatisticsAdapter extends RecyclerView.Adapter<StatisticsAdapter.ViewHolder> {
