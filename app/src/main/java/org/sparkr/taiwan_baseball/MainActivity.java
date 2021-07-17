@@ -6,13 +6,22 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
+import com.google.firebase.iid.FirebaseInstanceId;
+
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -21,11 +30,10 @@ public class MainActivity extends AppCompatActivity {
     /**
      * The {@link ViewPager} that will host the section contents.
      */
-    private CustomViewPager mViewPager;
+    private ViewPager2 mViewPager;
 
     private String tempTitle = "";
     private int selectedIndex = 0;
-    private final int[] yearMonth = new int[2];
 
     private final int[] iconResId = {
             R.mipmap.tab_news,
@@ -55,8 +63,6 @@ public class MainActivity extends AppCompatActivity {
         return selectedIndex;
     }
 
-    public int[] getSelectedYearMonth() { return yearMonth; }
-
     public void setTempTitle(String tempTitle) {
         this.tempTitle = tempTitle;
     }
@@ -67,6 +73,8 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
 
+
+
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -74,29 +82,23 @@ public class MainActivity extends AppCompatActivity {
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-        /**
-         * The  androidx.core.view.PagerAdapter that will provide
-         * fragments for each of the sections. We use a
-         * {@link FragmentPagerAdapter} derivative, which will keep every
-         * loaded fragment in memory. If this becomes too memory intensive, it
-         * may be best to switch to a
-         * androidx.core.app.FragmentStatePagerAdapter.
-         */
-        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(this);
 
         // Set up the ViewPager with the sections adapter.
+
         mViewPager = findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-//        mViewPager.setOffscreenPageLimit(4);
+        mViewPager.setOffscreenPageLimit(1);
 
 
         TabLayout tabLayout = findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(mViewPager);
-        tabLayout.getTabAt(0).setIcon(iconResId[0]);
+        new TabLayoutMediator(tabLayout, mViewPager,
+                (tab, position) -> tab.setIcon(iconResId[position])
+        ).attach();
+
         getSupportActionBar().setTitle(titleArray[0]);
-        for(int i = 1; i < tabLayout.getTabCount(); i++) {
-            tabLayout.getTabAt(i).setIcon(iconResId[i]);
-        }
+
+        tabLayout.getTabAt(0).setIcon(selectedIconresId[0]);
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -108,21 +110,21 @@ public class MainActivity extends AppCompatActivity {
                 selectedIndex = tab.getPosition();
 
                 if(tab.getPosition() == 2) {
-                    Fragment gameFragment = getSupportFragmentManager().findFragmentByTag("GameFragment");
-                    if(gameFragment != null && gameFragment.isVisible()) {
-                        gameFragment.setMenuVisibility(true);
+                    List<Fragment> fragments = getSupportFragmentManager().getFragments();
+                    for(Fragment fragment : fragments){
+                        if(fragment instanceof GameFragment) {
+                            fragment.setMenuVisibility(true);
+                        }
+
                     }
 
                 } else if(tab.getPosition() == 3) {
-                    Fragment statsListFragment = getSupportFragmentManager().findFragmentByTag("StatsListFragment");
-                    Fragment playerFragment = getSupportFragmentManager().findFragmentByTag("PlayerFragment");
+                    List<Fragment> fragments = getSupportFragmentManager().getFragments();
+                    for(Fragment fragment : fragments){
+                        if(fragment instanceof StatsListFragment || fragment instanceof  PlayerFragment) {
+                            fragment.setMenuVisibility(true);
+                        }
 
-                    if(statsListFragment != null && statsListFragment.isVisible()) {
-                        statsListFragment.setMenuVisibility(true);
-                    }
-
-                    if(playerFragment != null && playerFragment.isVisible()) {
-                        playerFragment.setMenuVisibility(true);
                     }
                 }
             }
@@ -139,6 +141,24 @@ public class MainActivity extends AppCompatActivity {
         progressDialog = new ProgressDialog(this);
         progressDialog.setCancelable(false);
         progressDialog.setMessage("Loading...");
+
+        // If tapping notification which has url.
+        try {
+            String url = getIntent().getStringExtra("url");
+            if (url != null) {
+                Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(webIntent);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
     }
 
     public void showProgressDialog() {
@@ -155,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void setPagingEnabled(boolean value) {
         if (mViewPager != null) {
-            mViewPager.setPagingEnabled(value);
+            mViewPager.setUserInputEnabled(value);
         }
     }
 
@@ -197,23 +217,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public static class SectionsPagerAdapter extends FragmentStateAdapter {
 
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
-    public static class SectionsPagerAdapter extends FragmentPagerAdapter {
-
-        public SectionsPagerAdapter(FragmentManager fm) {
-            super(fm);
+        public SectionsPagerAdapter(FragmentActivity fa) {
+            super(fa);
         }
 
         @NonNull
         @Override
-        public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            //return PlaceholderFragment.newInstance(position + 1);
+        public Fragment createFragment(int position) {
+
             switch (position) {
                 case 1: return RankFragment.newInstance();
                 case 2: return CalendarFragment.newInstance();
@@ -224,8 +237,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public int getCount() {
-            // Show 5 total pages.
+        public int getItemCount() {
             return 5;
         }
     }

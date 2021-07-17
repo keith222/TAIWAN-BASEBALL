@@ -69,18 +69,13 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <org.sparkr.taiwan_baseball.CustomViewPager
+    <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="horizontal"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
-    </org.sparkr.taiwan_baseball.CustomViewPager>
-<!--    <androidx.viewpager.widget.ViewPager-->
-<!--        android:id="@+id/container"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        app:layout_behavior="@string/appbar_scrolling_view_behavior">-->
+    </androidx.viewpager2.widget.ViewPager2>
 
-<!--    </androidx.viewpager.widget.ViewPager>-->
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

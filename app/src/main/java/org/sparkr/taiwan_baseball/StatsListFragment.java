@@ -68,6 +68,10 @@ public class StatsListFragment extends Fragment {
             ((MainActivity) getActivity()).showProgressDialog();
         }
 
+        if (getActivity() != null) {
+            ((MainActivity)getActivity()).setPagingEnabled(false);
+        }
+
         statslistList = new ArrayList<>();
         adapter = new StatsListAdapter(statslistList);
         client = Utils.getUnsafeOkHttpClient().build();
@@ -77,7 +81,6 @@ public class StatsListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
         setActionBar();
     }
 
@@ -145,9 +148,17 @@ public class StatsListFragment extends Fragment {
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (getActivity() != null) {
+            ((MainActivity)getActivity()).setPagingEnabled(true);
+        }
+    }
+
+    @Override
     public void setMenuVisibility(boolean menuVisible) {
         super.setMenuVisibility(menuVisible);
-
         if (menuVisible) {
             setActionBar();
         }
@@ -213,11 +224,11 @@ public class StatsListFragment extends Fragment {
 
                     adapter.setOnClick(position -> {
                         ((MainActivity)getActivity()).setTempTitle(category);
-                        String[] playerData = new String[]{statslistList.get(position).getPlayerUrl(), moreData.get(2)};
+                        String playerData = statslistList.get(position).getPlayerUrl();
 
                         Fragment playerFragment = new PlayerFragment();
                         Bundle bundle = new Bundle();
-                        bundle.putStringArray("playerData", playerData);
+                        bundle.putString("playerData", playerData);
                         playerFragment.setArguments(bundle);
                         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
                         transaction.add(R.id.fragment_statslist_container, playerFragment, "PlayerFragment");
@@ -270,7 +281,6 @@ public class StatsListFragment extends Fragment {
             private final TextView nameTextView;
             private final TextView teamTextView;
             private final TextView statsTextView;
-            private String plyaerURL;
 
             public StatsListViewHolder(View itemView) {
                 super(itemView);
