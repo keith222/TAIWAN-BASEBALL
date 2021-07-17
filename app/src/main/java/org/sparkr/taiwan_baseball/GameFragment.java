@@ -19,10 +19,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.sparkr.taiwan_baseball.Model.Game;
@@ -421,8 +422,8 @@ public class GameFragment extends Fragment {
             }
 
             @Override
-            public void onReceivedError(WebView view, int errorCode,String description, String failingUrl) {
-                super.onReceivedError(view, errorCode, description, failingUrl);
+            public void onReceivedError (WebView view, WebResourceRequest request, WebResourceError error) {
+                super.onReceivedError(view, request, error);
                 if (getActivity() != null) {
                     ((MainActivity)getActivity()).hideProgressDialog();
                 }
@@ -516,9 +517,9 @@ public class GameFragment extends Fragment {
                     }
 
                     @Override
-                    public void onReceivedError(WebView view, int errorCode,String description, String failingUrl) {
-                        super.onReceivedError(view, errorCode, description, failingUrl);
-                        Log.e("Error", description);
+                    public void onReceivedError (WebView view, WebResourceRequest request, WebResourceError error) {
+                        super.onReceivedError(view, request, error);
+                        Log.e("Error", error.getDescription()+"");
                         if (getActivity() != null) {
                             ((MainActivity)getActivity()).hideProgressDialog();
                         }
@@ -530,9 +531,7 @@ public class GameFragment extends Fragment {
         @JavascriptInterface
         public void showNoGame() {
             if (getActivity() != null) {
-                getActivity().runOnUiThread(() -> {
-                    gameView.findViewById(R.id.segmented).setVisibility(View.GONE);
-                });
+                getActivity().runOnUiThread(() -> gameView.findViewById(R.id.segmented).setVisibility(View.GONE));
 
                 ((MainActivity)getActivity()).hideProgressDialog();
             }

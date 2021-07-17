@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -19,7 +21,7 @@ import android.webkit.WebViewClient;
  */
 public class PlayerFragment extends Fragment {
 
-    private String[] playerData;
+    private String playerData;
 
     public PlayerFragment() {
         // Required empty public constructor
@@ -43,7 +45,7 @@ public class PlayerFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if(getArguments() != null) {
-            playerData = getArguments().getStringArray("playerData");
+            playerData = getArguments().getString("playerData");
         }
 
         if(getActivity() != null && !((MainActivity)getContext()).isFinishing() && !((MainActivity)getActivity()).isShowingProgressDialog()) {
@@ -75,15 +77,6 @@ public class PlayerFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        if (getActivity() != null) {
-            ((MainActivity)getActivity()).setPagingEnabled(true);
-        }
     }
 
     @Override
@@ -161,8 +154,8 @@ public class PlayerFragment extends Fragment {
             }
 
             @Override
-            public void onReceivedError(WebView view, int errorCode,String description, String failingUrl) {
-                super.onReceivedError(view, errorCode, description, failingUrl);
+            public void onReceivedError (WebView view, WebResourceRequest request, WebResourceError error) {
+                super.onReceivedError(view, request, error);
                 if (getActivity() != null) {
                     ((MainActivity)getActivity()).hideProgressDialog();
                 }
@@ -176,7 +169,7 @@ public class PlayerFragment extends Fragment {
         playerWebView.setVerticalScrollBarEnabled(true);
         playerWebView.setHorizontalScrollBarEnabled(true);
         playerWebView.getSettings().setUseWideViewPort(true);
-        playerWebView.setVisibility(View.INVISIBLE);
-        playerWebView.loadUrl(this.getString(R.string.CPBLSourceURL) + playerData[0]);
+        playerWebView.setVisibility(View.GONE);
+        playerWebView.loadUrl(this.getString(R.string.CPBLSourceURL) + playerData);
     }
 }

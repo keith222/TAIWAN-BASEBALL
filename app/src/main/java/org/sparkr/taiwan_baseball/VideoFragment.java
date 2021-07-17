@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -44,12 +46,12 @@ import okhttp3.Response;
  */
 public class VideoFragment extends Fragment {
 
-    private OkHttpClient client = new OkHttpClient();
-    private List videoList;
+    private final OkHttpClient client = new OkHttpClient();
+    private List<Video.VideoItem> videoList;
     private VideoAdapter adapter;
     private RecyclerView recyclerView;
     private String page = "";
-    private int visibleThreshold = 4;
+    private final int visibleThreshold = 4;
     private boolean isLoading;
     int lastVisibleItem, totalItemCount;
 
@@ -79,7 +81,7 @@ public class VideoFragment extends Fragment {
             ((MainActivity) getActivity()).showProgressDialog();
         }
 
-        videoList = new ArrayList<Video.VideoItem>();
+        videoList = new ArrayList<>();
         adapter = new VideoAdapter(videoList);
         fetchVideo(page);
     }
@@ -99,7 +101,7 @@ public class VideoFragment extends Fragment {
             public boolean isScrolled = false;
 
             @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
 
                 if(newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
@@ -108,7 +110,7 @@ public class VideoFragment extends Fragment {
             }
 
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
 
                 if(!isScrolled) { return; }
@@ -117,12 +119,9 @@ public class VideoFragment extends Fragment {
                 lastVisibleItem = layoutManager.findLastVisibleItemPosition();
 
                 if (!isLoading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
-                    recyclerView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            videoList.add(null);
-                            adapter.notifyItemInserted(videoList.size() - 1);
-                        }
+                    recyclerView.post(() -> {
+                        videoList.add(null);
+                        adapter.notifyItemInserted(videoList.size() - 1);
                     });
 
                     fetchVideo(page);
@@ -153,26 +152,23 @@ public class VideoFragment extends Fragment {
 
     private void fetchVideo(final String newPage) {
         Request request = new Request.Builder().url(this.getString(R.string.YoutubeAPIURL) + "search?part=snippet&channelId=UCDt9GAqyRzc2e5BNxPrwZrw&maxResults=15&order=date&pageToken="+ newPage +"&key=" + this.getString(R.string.YoutubeAPIKey)).build();
-        Call mcall = client.newCall(request);
-        mcall.enqueue(new Callback() {
+        Call mCall = client.newCall(request);
+        mCall.enqueue(new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 if(getContext() != null && getActivity() != null) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
-                                ((MainActivity) getActivity()).hideProgressDialog();
-                                Toast.makeText(getContext(), "影片資料發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
-                            }
+                    getActivity().runOnUiThread(() -> {
+                        if(getActivity() != null && !((MainActivity)getContext()).isFinishing()) {
+                            ((MainActivity) getActivity()).hideProgressDialog();
+                            Toast.makeText(getContext(), "影片資料發生錯誤，請稍後再試。", Toast.LENGTH_LONG).show();
                         }
                     });
                 }
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                final String resStr = response.body().string();
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                final String resStr = (response.body() != null) ? response.body().string() : "";
 
                 try {
                     GsonBuilder gsonBuilder = new GsonBuilder();
@@ -185,30 +181,24 @@ public class VideoFragment extends Fragment {
 
 
                     page = jsonObject.get("nextPageToken").getAsString();
-                    adapter.setOnClick(new VideoAdapter.OnItemClicked(){
-                        @Override
-                        public void onItemClick(int position) {
-                            Video.VideoItem selectedVideo = (Video.VideoItem) videoList.get(position);
-                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getActivity().getString(R.string.YoutubeURL) + selectedVideo.getId().getVideoId()));
-                            startActivity(intent);
-                        }
+                    adapter.setOnClick(position -> {
+                        Video.VideoItem selectedVideo = videoList.get(position);
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getActivity().getString(R.string.YoutubeURL) + selectedVideo.getId().getVideoId()));
+                        startActivity(intent);
                     });
 
-                    recyclerView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            adapter.notifyDataSetChanged();
+                    recyclerView.post(() -> {
+                        adapter.notifyDataSetChanged();
 
-                            if((videoList.size() - video.getVideoItem().size() - 1) > 0) {
-                                videoList.remove(videoList.size() - video.getVideoItem().size() - 1);
-                                adapter.notifyItemRemoved(videoList.size());
-                            }
+                        if((videoList.size() - video.getVideoItem().size() - 1) > 0) {
+                            videoList.remove(videoList.size() - video.getVideoItem().size() - 1);
+                            adapter.notifyItemRemoved(videoList.size());
+                        }
 
-                            setLoaded();
+                        setLoaded();
 
-                            if (getActivity() != null) {
-                                ((MainActivity)getActivity()).hideProgressDialog();
-                            }
+                        if (getActivity() != null) {
+                            ((MainActivity)getActivity()).hideProgressDialog();
                         }
                     });
 
@@ -225,7 +215,7 @@ public class VideoFragment extends Fragment {
 
     public static class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-        private List<Video.VideoItem> videos;
+        private final List<Video.VideoItem> videos;
         private OnItemClicked onClick;
 
         public interface OnItemClicked {
@@ -236,7 +226,7 @@ public class VideoFragment extends Fragment {
             this.videos = videos;
         }
 
-        public class VideoViewHolder extends RecyclerView.ViewHolder {
+        public static class VideoViewHolder extends RecyclerView.ViewHolder {
 
             private final TextView videoTitleTextView;
             private final TextView videoDateTextView;
@@ -246,39 +236,38 @@ public class VideoFragment extends Fragment {
             public VideoViewHolder(View itemView) {
                 super(itemView);
 
-                videoTitleTextView = (TextView) itemView.findViewById(R.id.videoTitleTextView);
-                videoDateTextView = (TextView) itemView.findViewById(R.id.videoDateTextView);
-                videoImageView = (ImageView) itemView.findViewById(R.id.videoImageView);
+                videoTitleTextView = itemView.findViewById(R.id.videoTitleTextView);
+                videoDateTextView = itemView.findViewById(R.id.videoDateTextView);
+                videoImageView = itemView.findViewById(R.id.videoImageView);
             }
         }
 
-        public class LoadingViewHolder extends RecyclerView.ViewHolder {
+        public static class LoadingViewHolder extends RecyclerView.ViewHolder {
             public ProgressBar progressBar;
 
             public LoadingViewHolder(View view) {
                 super(view);
-                progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+                progressBar = view.findViewById(R.id.progressBar);
             }
         }
 
+        @NonNull
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             Context context = parent.getContext();
             if(viewType == 0) {
                 View view = LayoutInflater.from(context).inflate(R.layout.video_list, parent, false);
-                VideoViewHolder videoViewHolder = new VideoViewHolder(view);
-                return videoViewHolder;
+                return new VideoViewHolder(view);
 
             } else {
                 View view = LayoutInflater.from(context).inflate(R.layout.item_loading, parent, false);
-                LoadingViewHolder loadingViewHolder = new LoadingViewHolder(view);
-                return loadingViewHolder;
+                return new LoadingViewHolder(view);
 
             }
         }
 
         @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
             if(holder instanceof VideoViewHolder) {
                 Video.VideoItem videoData = videos.get(position);
                 VideoViewHolder videoViewHolder = (VideoViewHolder)holder;
@@ -288,12 +277,7 @@ public class VideoFragment extends Fragment {
                 Glide.with(videoViewHolder.videoImageView.getContext()).load(videoData.getSnippet().getThumbnails().getHigh().getVideoImageUrl()).centerCrop().error(R.mipmap.logo).centerCrop().into(videoViewHolder.videoImageView);
 
 
-                videoViewHolder.videoImageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        onClick.onItemClick(position);
-                    }
-                });
+                videoViewHolder.videoImageView.setOnClickListener(v -> onClick.onItemClick(position));
 
             } else if(holder instanceof LoadingViewHolder) {
                 LoadingViewHolder loadingViewHolder = (LoadingViewHolder)holder;

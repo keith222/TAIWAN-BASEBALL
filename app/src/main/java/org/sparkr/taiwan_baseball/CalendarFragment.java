@@ -358,7 +358,7 @@ public class CalendarFragment extends Fragment {
             itemHolder.itemView.setOnClickListener(v -> {
 
                 Fragment gameFragment = GameFragment.newInstance(gameList.get(position));
-                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
                 transaction.add(R.id.fragment_calendar_container, gameFragment, "GameFragment");
                 transaction.addToBackStack(null);
                 transaction.commit();
