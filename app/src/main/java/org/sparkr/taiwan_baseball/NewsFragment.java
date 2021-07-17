@@ -20,15 +20,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
-
 import java.io.IOException;
 
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,11 +30,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.sparkr.taiwan_baseball.Model.News;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -88,7 +76,6 @@ public class NewsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Utils.handleSSLHandshake();
         newsList = new ArrayList<>();
         adapter = new NewsAdapter(newsList);
         client = Utils.getUnsafeOkHttpClient().build();
@@ -165,8 +152,6 @@ public class NewsFragment extends Fragment {
     public void setLoaded() {
         isLoading = false;
     }
-
-
 
     private void fetchNews(final int newPage) {
         Request request = new Request.Builder().url(this.getString(R.string.CPBLSourceURL) + "/xmdoc?page=" + newPage).build();
@@ -254,7 +239,6 @@ public class NewsFragment extends Fragment {
             private final TextView newsTitleTextView;
             private final TextView newsDateTextView;
             private final ImageView newsImageView;
-            private String newsURL;
 
             public NewsViewHolder(View itemView) {
                 super(itemView);
@@ -296,23 +280,12 @@ public class NewsFragment extends Fragment {
                 NewsViewHolder newsViewHolder = (NewsViewHolder)holder;
                 newsViewHolder.newsTitleTextView.setText(newsData.getTitle());
                 newsViewHolder.newsDateTextView.setText(newsData.getDate());
-                newsViewHolder.newsURL = newsData.getNewsUrl();
+                newsViewHolder.newsImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
-                Glide.with(newsViewHolder.newsImageView.getContext())
+                GlideApp.with(newsViewHolder.newsImageView.getContext())
                         .load(newsData.getImageUrl())
-                        .listener(new RequestListener<String, GlideDrawable>() {
-                            @Override
-                            public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
-                                Log.e("Error", e.getLocalizedMessage());
-                                return false;
-                            }
-
-                            @Override
-                            public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                                return false;
-                            }
-                        })
-                        .centerCrop().into(newsViewHolder.newsImageView);
+                        .error(R.mipmap.logo)
+                        .into(newsViewHolder.newsImageView);
 
                 newsViewHolder.newsImageView.setOnClickListener(v -> onClick.onItemClick(position));
 
