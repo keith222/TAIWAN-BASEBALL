@@ -84,9 +84,7 @@ public class CalendarFragment extends Fragment {
 
         if (month < 2) {
             year--;
-            month = 11;
-        } else if (month > 11) {
-            month = 11;
+            month = 12;
         }
 
         fetchGame(Integer.toString(year), Integer.toString(month));
@@ -115,7 +113,7 @@ public class CalendarFragment extends Fragment {
         ImageButton forwardImageButton = view.findViewById(R.id.forwardImageButton);
         forwardImageButton.setOnClickListener(v -> {
             month += 1;
-            if (month > 11) {
+            if (month > 12) {
                 year += 1;
                 month = 2;
             }
@@ -127,7 +125,7 @@ public class CalendarFragment extends Fragment {
             month -= 1;
             if (month < 2) {
                 year -= 1;
-                month = 11;
+                month = 12;
             }
             fetchGame(Integer.toString(year), Integer.toString(month));
         });

@@ -129,7 +129,7 @@ public class Utils {
             case "RBI":
                 return 6;
             case "SB":
-            case "21":
+            case "SO":
                 return 21;
             case "SV":
                 return 9;
