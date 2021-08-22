@@ -75,7 +75,7 @@ public class DateSelectionActivity extends AppCompatActivity {
             }
         } else {
             // month list
-            for (int m = 2; m <= 11; m++) {
+            for (int m = 2; m <= 12; m++) {
                 yearMonthList.add(m+"月");
             }
         }
@@ -128,7 +128,7 @@ public class DateSelectionActivity extends AppCompatActivity {
                 if (selectedPosition == position) { return; }
                 selectedPosition = position;
 
-                if (size == 10) {
+                if (size == 11) {
                     month = 2 + position;
                 } else {
                     year = 1990 + position;
