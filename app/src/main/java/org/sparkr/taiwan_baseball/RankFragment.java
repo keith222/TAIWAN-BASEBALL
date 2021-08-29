@@ -200,7 +200,7 @@ public class RankFragment extends Fragment {
     public void onDataFetched() {
         if (completedCount == 3) {
             sectionList.remove(null);
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; i <= 2; i++) {
                 if (sectionList.get(i) == null) { continue; }
 
                 adapter.addSection(sectionList.get(i));
