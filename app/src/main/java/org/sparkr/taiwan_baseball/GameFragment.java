@@ -11,6 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.util.Base64;
+import android.util.JsonReader;
+import android.util.JsonToken;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
+import android.webkit.ValueCallback;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
@@ -29,6 +32,8 @@ import android.widget.TextView;
 import org.sparkr.taiwan_baseball.Model.Game;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.StringReader;
 
 
 import info.hoang8f.android.segmented.SegmentedGroup;
@@ -54,11 +59,11 @@ public class GameFragment extends Fragment {
             "document.querySelectorAll('.BtnTop').forEach(function(a){a.remove()});"+
             "document.querySelectorAll('.GameSearch').forEach(function(a){a.remove()});"+
             "document.querySelectorAll('.GameDateSelect').forEach(function(a){a.remove()});"+
-            "document.getElementById('Footer').remove();"+
-            "document.getElementById('MenuMobile').remove();"+
-            "document.getElementById('Header').remove();"+
-            "document.getElementById('Breadcrumbs').remove();"+
-            "document.getElementById('nav').remove();";
+            "document.querySelectorAll('#Footer').forEach(function(a){a.remove()});"+
+            "document.querySelectorAll('#MenuMobile').forEach(function(a){a.remove()});"+
+            "document.querySelectorAll('#Header').forEach(function(a){a.remove()});"+
+            "document.querySelectorAll('#Breadcrumbs').forEach(function(a){a.remove()});"+
+            "document.querySelectorAll('#nav').forEach(function(a){a.remove()});";
 
     private final String boxJSCode = "" +
             "function changeStyle() {\n" +
@@ -455,14 +460,13 @@ public class GameFragment extends Fragment {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-
                 final String liveJSCodeString = liveJSCode.replace("%GI", guestImageString).replace("%HI", homeImageString);
                 view.evaluateJavascript(liveJSCodeString, null);
             }
 
             @Override
-            public void onReceivedError(WebView view, int errorCode,String description, String failingUrl) {
-                super.onReceivedError(view, errorCode, description, failingUrl);
+            public void onReceivedError (WebView view, WebResourceRequest request, WebResourceError error) {
+                super.onReceivedError(view, request, error);
                 if (getActivity() != null) {
                     view.setVisibility(View.GONE);
                     ((MainActivity)getActivity()).hideProgressDialog();
@@ -494,6 +498,7 @@ public class GameFragment extends Fragment {
 
         @JavascriptInterface
         public void showScoreBoard(String html) {
+            Log.e("", "TEST4");
             final String scoreWebHtml = scoreHtml.replace("%@", html).replace("%GI", guestImageString).replace("%HI", homeImageString);
             WebView scoreWebView = gameView.findViewById(R.id.scoreWebView);
             scoreWebView.setVisibility(View.VISIBLE);
@@ -530,6 +535,7 @@ public class GameFragment extends Fragment {
 
         @JavascriptInterface
         public void showNoGame() {
+            Log.e("", "TEST3");
             if (getActivity() != null) {
                 getActivity().runOnUiThread(() -> gameView.findViewById(R.id.segmented).setVisibility(View.GONE));
 
