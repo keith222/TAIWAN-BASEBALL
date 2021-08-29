@@ -498,7 +498,6 @@ public class GameFragment extends Fragment {
 
         @JavascriptInterface
         public void showScoreBoard(String html) {
-            Log.e("", "TEST4");
             final String scoreWebHtml = scoreHtml.replace("%@", html).replace("%GI", guestImageString).replace("%HI", homeImageString);
             WebView scoreWebView = gameView.findViewById(R.id.scoreWebView);
             scoreWebView.setVisibility(View.VISIBLE);
@@ -535,7 +534,6 @@ public class GameFragment extends Fragment {
 
         @JavascriptInterface
         public void showNoGame() {
-            Log.e("", "TEST3");
             if (getActivity() != null) {
                 getActivity().runOnUiThread(() -> gameView.findViewById(R.id.segmented).setVisibility(View.GONE));
 
