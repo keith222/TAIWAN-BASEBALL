@@ -15,6 +15,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.android.material.tabs.TabLayout;
@@ -198,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
                 getSupportActionBar().setDisplayShowHomeEnabled(false);
             }
 
-            if(!tempTitle.isEmpty()) {
+            if(!TextUtils.isEmpty(tempTitle)) {
                 getSupportActionBar().setTitle(tempTitle);
                 tempTitle = "";
 

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -348,8 +349,8 @@ public class CalendarFragment extends Fragment {
             Game game = gameList.get(position);
             itemHolder.gameNumberTextView.setText(Utils.gameString(game.getGame()));
             itemHolder.guestImageView.setImageResource(Utils.teamImageView(game.getGuest()));
-            itemHolder.guestScoreTextView.setText((game.getG_score().isEmpty()) ? "--" : game.getG_score());
-            itemHolder.homeScoreTextView.setText((game.getH_score().isEmpty()) ? "--" : game.getH_score());
+            itemHolder.guestScoreTextView.setText((TextUtils.isEmpty(game.getG_score())) ? "--" : game.getG_score());
+            itemHolder.homeScoreTextView.setText((TextUtils.isEmpty(game.getH_score())) ? "--" : game.getH_score());
             itemHolder.homeImageView.setImageResource(Utils.teamImageView(game.getHome()));
             itemHolder.placeTextView.setText(game.getPlace());
 

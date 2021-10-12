@@ -9,6 +9,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -218,7 +219,7 @@ public class StatsListFragment extends Fragment {
                         statslistList.add(new StatsList(numData, nameData, teamData, statsData, playerURLData));
                     }
 
-                    if(!doc.select(".setting").text().split("/")[0].replaceAll("[^\\d]", "").isEmpty()) {
+                    if(!TextUtils.isEmpty(doc.select(".setting").text().split("/")[0].replaceAll("[^\\d]", ""))) {
                         totalPage = Integer.parseInt(doc.select(".setting").text().split("/")[0].replaceAll("[^\\d]", ""));
                     }
 

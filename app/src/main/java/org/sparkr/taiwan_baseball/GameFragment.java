@@ -10,6 +10,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.JsonReader;
 import android.util.JsonToken;
@@ -281,15 +282,15 @@ public class GameFragment extends Fragment {
 
         ((TextView) view.findViewById(R.id.gameNumberTextView)).setText(Utils.gameString(receivedGame.getGame()));
         ((ImageView) view.findViewById(R.id.guestImageView)).setImageResource(Utils.teamImageView(receivedGame.getGuest()));
-        ((TextView) view.findViewById(R.id.guestScoreTextView)).setText((receivedGame.getG_score().isEmpty())?"--":receivedGame.getG_score());
-        ((TextView) view.findViewById(R.id.homeScoreTextView)).setText((receivedGame.getH_score().isEmpty())?"--":receivedGame.getH_score());
+        ((TextView) view.findViewById(R.id.guestScoreTextView)).setText((TextUtils.isEmpty(receivedGame.getG_score()))?"--":receivedGame.getG_score());
+        ((TextView) view.findViewById(R.id.homeScoreTextView)).setText((TextUtils.isEmpty(receivedGame.getH_score()))?"--":receivedGame.getH_score());
         ((ImageView) view.findViewById(R.id.homeImageView)).setImageResource(Utils.teamImageView(receivedGame.getHome()));
         ((TextView) view.findViewById(R.id.placeTextView)).setText(receivedGame.getPlace());
         view.findViewById(R.id.boxWebView).setVisibility(View.VISIBLE);
         view.findViewById(R.id.gameWebView).setVisibility(View.GONE);
 
         view.findViewById(R.id.streamImageView).setOnClickListener(v -> {
-            if(!receivedGame.getStream().isEmpty()) {
+            if(!TextUtils.isEmpty(receivedGame.getStream())) {
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(receivedGame.getStream()));
                 startActivity(intent);
             }
