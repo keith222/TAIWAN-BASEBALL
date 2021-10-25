@@ -153,17 +153,17 @@ public class StatisticsFragment extends Fragment {
                         }
                     }
 
-                    battingStats.add(statsList.get(0));
-                    battingStats.add(statsList.get(1));
-                    battingStats.add(statsList.get(2));
-                    battingStats.add(statsList.get(3));
-                    battingStats.add(statsList.get(4));
+                    battingStats.add(statsList.get(5));
+                    battingStats.add(statsList.get(6));
+                    battingStats.add(statsList.get(7));
+                    battingStats.add(statsList.get(8));
+                    battingStats.add(statsList.get(9));
 
-                    pitchingStats.add(statsList.get(5));
-                    pitchingStats.add(statsList.get(6));
-                    pitchingStats.add(statsList.get(7));
-                    pitchingStats.add(statsList.get(8));
-                    pitchingStats.add(statsList.get(9));
+                    pitchingStats.add(statsList.get(0));
+                    pitchingStats.add(statsList.get(1));
+                    pitchingStats.add(statsList.get(2));
+                    pitchingStats.add(statsList.get(3));
+                    pitchingStats.add(statsList.get(4));
 
                     adapter.setOnClick(position -> {
                         ArrayList<String> moreData = new ArrayList<>();

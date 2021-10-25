@@ -143,25 +143,25 @@ public class Utils {
     public static String getCategory(int index) {
         switch (index) {
             case 0:
-                return "AVG";
-            case 1:
-                return "H";
-            case 2:
-                return "HR";
-            case 3:
-                return "RBI";
-            case 4:
-                return "SB";
-            case 5:
                 return "ERA";
-            case 6:
+            case 1:
                 return "W";
-            case 7:
+            case 2:
                 return "SV";
-            case 8:
+            case 3:
                 return "HLD";
-            case 9:
+            case 4:
                 return "SO";
+            case 5:
+                return "AVG";
+            case 6:
+                return "H";
+            case 7:
+                return "HR";
+            case 8:
+                return "RBI";
+            case 9:
+                return "SB";
             default:
                 return "";
         }
