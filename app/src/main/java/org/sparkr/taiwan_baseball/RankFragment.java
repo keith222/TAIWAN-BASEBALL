@@ -189,8 +189,8 @@ public class RankFragment extends Fragment {
                         if (getActivity() != null) {
                             ((MainActivity)getActivity()).hideProgressDialog();
                         }
-
-                        Log.d("error:", e.getMessage());
+                        e.printStackTrace();
+                        Log.d("error-rank:", e.getMessage());
                     }
                 }
             });
@@ -201,8 +201,7 @@ public class RankFragment extends Fragment {
         if (completedCount == 3) {
             sectionList.remove(null);
             for (int i = 0; i <= 2; i++) {
-                if (sectionList.get(i) == null) { continue; }
-
+                if (i >= sectionList.size()) { continue; }
                 adapter.addSection(sectionList.get(i));
             }
             recyclerView.post(() -> {
