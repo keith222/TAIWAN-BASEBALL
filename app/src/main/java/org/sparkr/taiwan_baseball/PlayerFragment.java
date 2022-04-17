@@ -110,11 +110,16 @@ public class PlayerFragment extends Fragment {
                 "                document.querySelectorAll('.nationality').forEach(function(a){a.remove()});\n" +
                 "                document.querySelectorAll('.original_name').forEach(function(a){a.remove()});\n" +
                 "                document.querySelectorAll('.draft').forEach(function(a){a.remove()});\n" +
+                "                document.querySelectorAll('.adGeek-author').forEach(function(a){a.remove()});\n" +
+                "                document.querySelectorAll('.adGeek-popup').forEach(function(a){a.remove()});\n" +
+                "                document.getElementById('mm-blocker').remove();\n" +
                 "                document.getElementById('Footer').remove();\n" +
                 "                document.getElementById('MenuMobile').remove();\n" +
                 "                document.getElementById('Header').remove();\n" +
                 "                document.getElementById('Breadcrumbs').remove();\n" +
                 "                document.getElementById('nav').remove();\n" +
+                "                const ad = document.getElementById('adGeek-slot-div-gpt-ad-1633344967434-0');\n" +
+                "                if (ad != null) ad.remove();\n" +
                 "                const cssTemplateString = `\n" +
                 "                *{-webkit-touch-callout:none;-webkit-user-select:none}\n" +
                 "                body {background-color: white;}\n" +

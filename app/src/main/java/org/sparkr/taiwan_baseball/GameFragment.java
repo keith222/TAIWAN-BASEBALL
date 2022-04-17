@@ -64,7 +64,11 @@ public class GameFragment extends Fragment {
             "document.querySelectorAll('#MenuMobile').forEach(function(a){a.remove()});"+
             "document.querySelectorAll('#Header').forEach(function(a){a.remove()});"+
             "document.querySelectorAll('#Breadcrumbs').forEach(function(a){a.remove()});"+
-            "document.querySelectorAll('#nav').forEach(function(a){a.remove()});";
+            "document.querySelectorAll('#nav').forEach(function(a){a.remove()});"+
+            "document.querySelectorAll('.adGeek-author').forEach(function(a){a.remove()});" +
+            "document.querySelectorAll('.adGeek-popup').forEach(function(a){a.remove()});"+
+            "document.getElementById('mm-blocker').remove();";
+
 
     private final String boxJSCode = "" +
             "function changeStyle() {\n" +
@@ -98,7 +102,14 @@ public class GameFragment extends Fragment {
             "       }\n" +
             "   }, 1000);\n" +
             "};\n" +
-            "changeStyle();";
+            "changeStyle();" +
+            "setTimeout(() => {\n" +
+            "   document.querySelectorAll('.adGeek-author').forEach(function(a){a.remove()});\n" +
+            "   document.querySelectorAll('.adGeek-popup').forEach(function(a){a.remove()});\n" +
+            "   document.getElementById('mm-blocker').remove();\n" +
+            "   const ad = document.getElementById('adGeek-slot-div-gpt-ad-1633344967434-0');\n" +
+            "   if (ad != null) ad.remove();\n" +
+            "}, 6000);\n";
 
     private final String liveJSCode = "" +
             "app.switchTabs(3);\n" +
@@ -150,7 +161,14 @@ public class GameFragment extends Fragment {
             "           document.querySelectorAll('.team.home').forEach(function(a){a.innerHTML = '<span><img class=\"team_image\" src=\"data:application/png;base64,%HI\"></span>'});\n" +
             "       });\n" +
             "   });\n" +
-            "};";
+            "};\n" +
+            "setTimeout(() => {\n" +
+            "   document.querySelectorAll('.adGeek-author').forEach(function(a){a.remove()});\n" +
+            "   document.querySelectorAll('.adGeek-popup').forEach(function(a){a.remove()});\n" +
+            "   document.getElementById('mm-blocker').remove();\n" +
+            "   const ad = document.getElementById('adGeek-slot-div-gpt-ad-1633344967434-0');\n" +
+            "   if (ad != null) ad.remove();\n" +
+            "}, 6000);";
 
     private final String scoreHtml = "" +
             "<!DOCTYPE html>" +
