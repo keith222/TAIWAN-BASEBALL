@@ -75,6 +75,8 @@ public class Utils {
                 return R.mipmap.t4_2;
             case "4-3":
                 return R.mipmap.t4_3;
+            case "6":
+                return R.mipmap.t6;
             case "A-1":
                 return R.mipmap.a_1;
             case "A-2":

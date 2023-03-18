@@ -45,6 +45,7 @@ public class Game implements Serializable{
     }
 
     public String getStream() {
-        return stream;
+        return "https://hamivideo.hinet.net/main/606.do";
+//        return stream;
     }
 }

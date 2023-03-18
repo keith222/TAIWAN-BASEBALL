@@ -15,9 +15,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import io.github.luizgrp.sectionedrecyclerviewadapter.Section;
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionParameters;
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
-import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection;
+
 
 public class DateSelectionActivity extends AppCompatActivity {
 
@@ -90,7 +91,7 @@ public class DateSelectionActivity extends AppCompatActivity {
         finish();
     }
 
-    private class YearMonthSection extends StatelessSection {
+    private class YearMonthSection extends Section {
 
         private final String title;
         private final List yearMonthList;

@@ -39,7 +39,6 @@ import okhttp3.Response;
 
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionParameters;
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
-import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -289,7 +288,7 @@ public class RankFragment extends Fragment {
         });
     }
 
-    public static class RankSection extends StatelessSection {
+    public static class RankSection extends Section {
         private final String title;
         private final List<Rank> rankList;
 
@@ -337,7 +336,7 @@ public class RankFragment extends Fragment {
 
         public int getTeamImage(String team) {
             if (team.contains("味全")) {
-                return R.mipmap.t__1;
+                return R.mipmap.t_1;
             } else if (team.contains("中信")) {
                 return R.mipmap.t1;
             } else if (team.contains("統一")) {
@@ -346,6 +345,8 @@ public class RankFragment extends Fragment {
                 return R.mipmap.t3_0;
             } else if (team.contains("富邦")) {
                 return R.mipmap.t4;
+            } else if (team.contains("台鋼")) {
+                return R.mipmap.t6;
             }
 
             return R.mipmap.logo;

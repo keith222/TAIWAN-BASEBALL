@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.sparkr.taiwan_baseball">
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="LockedOrientationActivity">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -12,7 +13,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+
+        >
         <meta-data
             android:name="google_analytics_adid_collection_enabled"
             android:value="false" />
@@ -25,9 +28,9 @@
 
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.Launcher">
+            android:theme="@style/AppTheme.Launcher"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -44,7 +47,6 @@
 
         <activity
             android:name=".DateSelectionActivity"
-            android:label="@string/app_name"
             android:theme="@style/AppTheme" />
     </application>
 

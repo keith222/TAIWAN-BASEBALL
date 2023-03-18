@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -36,11 +38,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 
+import io.github.luizgrp.sectionedrecyclerviewadapter.Section;
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionParameters;
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
-import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection;
 
 
 /**
@@ -54,6 +57,19 @@ public class CalendarFragment extends Fragment {
     private SectionedRecyclerViewAdapter adapter;
     private int year = 0;
     private int month = 0;
+
+    private final ActivityResultLauncher<Intent> resultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    // There are no request codes
+                    Intent data = result.getData();
+                    if (data != null) {
+                        year = data.getIntExtra("year", 0);
+                        month = data.getIntExtra("month", 0);
+                        fetchGame(Integer.toString(year), Integer.toString(month));
+                    }
+                }
+            });
 
     public CalendarFragment() {
         // Required empty public constructor
@@ -95,7 +111,7 @@ public class CalendarFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        ((TextView) getView().findViewById(R.id.calendarTextView)).setText(year + "年" + month + "月");
+        ((TextView) requireView().findViewById(R.id.calendarTextView)).setText(year + "年" + month + "月");
     }
 
     @Override
@@ -108,7 +124,7 @@ public class CalendarFragment extends Fragment {
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.addItemDecoration(new DividerItemDecoration(this.getContext(), LinearLayoutManager.VERTICAL));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this.requireContext(), LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(adapter);
 
         ImageButton forwardImageButton = view.findViewById(R.id.forwardImageButton);
@@ -145,27 +161,17 @@ public class CalendarFragment extends Fragment {
         int id = item.getItemId();
         if (id == R.id.action_calendar) {
             Intent intent = new Intent(getActivity(), DateSelectionActivity.class);
-            startActivityForResult(intent, 1);
+            resultLauncher.launch(intent);
         }
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
-            year = data.getIntExtra("year", 0);
-            month = data.getIntExtra("month", 0);
-            fetchGame(Integer.toString(year), Integer.toString(month));
-        }
-    }
-
     private void fetchGame(final String year, final String month) {
-        if (getActivity().findViewById(R.id.calendarTextView) != null) {
-            ((TextView) getActivity().findViewById(R.id.calendarTextView)).setText(year + "年" + month + "月");
+        if (requireActivity().findViewById(R.id.calendarTextView) != null) {
+            ((TextView) requireActivity().findViewById(R.id.calendarTextView)).setText(year + "年" + month + "月");
         }
 
-        if (getActivity() != null && !((MainActivity) getContext()).isFinishing() && !((MainActivity) getActivity()).isShowingProgressDialog()) {
+        if (getActivity() != null && !((MainActivity) requireContext()).isFinishing() && !((MainActivity) getActivity()).isShowingProgressDialog()) {
             ((MainActivity) getActivity()).showProgressDialog();
         }
 
@@ -182,7 +188,7 @@ public class CalendarFragment extends Fragment {
                 if (dataSnapshot.getChildrenCount() < 1) {
                     if (getActivity() != null) {
                         getActivity().runOnUiThread(() -> {
-                            if (getActivity() != null && !((MainActivity) getContext()).isFinishing()) {
+                            if (getActivity() != null && !((MainActivity) requireContext()).isFinishing()) {
                                 ((MainActivity) getActivity()).hideProgressDialog();
                                 Toast.makeText(getContext(), "未有比賽資料。", Toast.LENGTH_LONG).show();
                             }
@@ -202,7 +208,7 @@ public class CalendarFragment extends Fragment {
 
                     tempMap.put(dataSnapshot.getKey(), gameList);
                     Calendar calendar = Calendar.getInstance();
-                    calendar.set(Integer.parseInt(year), (Integer.parseInt(month) - 1), Integer.parseInt(snapshot.getKey()));
+                    calendar.set(Integer.parseInt(year), (Integer.parseInt(month) - 1), Integer.parseInt(Objects.requireNonNull(snapshot.getKey())));
 
                     int weekDay = calendar.get(Calendar.DAY_OF_WEEK);
                     adapter.addSection(new GameSection(month + "月" + snapshot.getKey() + "日 " + getChineseWeekDay(weekDay), gameList));
@@ -211,11 +217,10 @@ public class CalendarFragment extends Fragment {
 
                 if (recyclerView != null) {
                     recyclerView.post(() -> {
-                        ((TextView) getActivity().findViewById(R.id.calendarTextView)).setText(year + "年" + month + "月");
+                        ((TextView) requireActivity().findViewById(R.id.calendarTextView)).setText(year + "年" + month + "月");
 
                         adapter.notifyDataSetChanged();
-                        ((MainActivity) getActivity()).hideProgressDialog();
-
+                        ((MainActivity) requireActivity()).hideProgressDialog();
                     });
                 }
 
@@ -239,7 +244,7 @@ public class CalendarFragment extends Fragment {
                 if (dataSnapshot.getChildrenCount() < 1) {
                     if (getActivity() != null) {
                         getActivity().runOnUiThread(() -> {
-                            if (getActivity() != null && !((MainActivity) getContext()).isFinishing()) {
+                            if (getActivity() != null && !((MainActivity) requireContext()).isFinishing()) {
                                 ((MainActivity) getActivity()).hideProgressDialog();
                                 Toast.makeText(getContext(), "未有比賽資料。", Toast.LENGTH_LONG).show();
                             }
@@ -270,7 +275,7 @@ public class CalendarFragment extends Fragment {
                 if (recyclerView != null) {
                     recyclerView.post(() -> {
                         adapter.notifyDataSetChanged();
-                        ((MainActivity) getActivity()).hideProgressDialog();
+                        ((MainActivity) requireActivity()).hideProgressDialog();
                     });
                 }
             }
@@ -313,7 +318,7 @@ public class CalendarFragment extends Fragment {
         }
     }
 
-    private class GameSection extends StatelessSection {
+    private class GameSection extends Section {
 
         private final String title;
         private List<Game> gameList;
