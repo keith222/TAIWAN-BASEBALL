@@ -57,6 +57,7 @@ public class CalendarFragment extends Fragment {
     private SectionedRecyclerViewAdapter adapter;
     private int year = 0;
     private int month = 0;
+    private String team = "";
 
     private final ActivityResultLauncher<Intent> resultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
             result -> {
@@ -64,8 +65,10 @@ public class CalendarFragment extends Fragment {
                     // There are no request codes
                     Intent data = result.getData();
                     if (data != null) {
+                        team = data.getStringExtra("team");
                         year = data.getIntExtra("year", 0);
                         month = data.getIntExtra("month", 0);
+
                         fetchGame(Integer.toString(year), Integer.toString(month));
                     }
                 }
@@ -203,6 +206,10 @@ public class CalendarFragment extends Fragment {
                     List<Game> gameList = new ArrayList<>();
                     for (int i = 0; i < snapshot.getChildrenCount(); i++) {
                         Game game = snapshot.child(Integer.toString(i)).getValue(Game.class);
+                        if (team != null && !team.isEmpty() && !team.equals("all")) {
+                            if (!(game.getHome().equals(team) || game.getGuest().equals(team)))
+                                continue;
+                        }
                         gameList.add(game);
                     }
 

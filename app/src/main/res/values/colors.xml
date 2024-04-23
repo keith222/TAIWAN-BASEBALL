@@ -7,4 +7,11 @@
     <color name="white">#ffffff</color>
     <color name="lighterCPBLBlue">#0A223B</color>
     <color name="gray">#BBBBBB</color>
+    <color name="dragonRed">#FF0000</color>
+    <color name="elephantYellow">#F5B027</color>
+    <color name="lionOrange">#DD5900</color>
+    <color name="monkeyRed">#651410</color>
+    <color name="guardianBlue">#001054</color>
+    <color name="hawkGreen">#0D251C</color>
+
 </resources>

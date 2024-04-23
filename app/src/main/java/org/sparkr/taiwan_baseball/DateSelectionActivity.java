@@ -7,11 +7,13 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
@@ -25,6 +27,8 @@ public class DateSelectionActivity extends AppCompatActivity {
     private SectionedRecyclerViewAdapter adapter;
     private int year = 0;
     private int month = 0;
+    private String team = "all";
+    private final List<String> teamCode =  new ArrayList<>(Arrays.asList("所有", "龍", "兄弟", "獅", "桃猿", "悍將", "雄鷹"));
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +44,7 @@ public class DateSelectionActivity extends AppCompatActivity {
         adapter = new SectionedRecyclerViewAdapter();
         adapter.addSection(new YearMonthSection("選擇年份", addItemList(0)));
         adapter.addSection(new YearMonthSection("選擇月份", addItemList(1)));
+        adapter.addSection(new YearMonthSection("選擇隊伍", teamCode));
 
         RecyclerView recyclerView = findViewById(R.id.dateSelectionRecyclerView);
         final GridLayoutManager layoutManager = new GridLayoutManager(this, 4);
@@ -83,10 +88,11 @@ public class DateSelectionActivity extends AppCompatActivity {
         return yearMonthList;
     }
 
-    private void sendDataBack(int year, int month) {
+    private void sendDataBack(int year, int month, String team) {
         Intent intent = new Intent();
         intent.putExtra("year", year);
         intent.putExtra("month", month);
+        intent.putExtra("team", team);
         setResult(RESULT_OK, intent);
         finish();
     }
@@ -125,17 +131,23 @@ public class DateSelectionActivity extends AppCompatActivity {
                 itemHolder.itemView.setBackgroundColor(0);
             }
 
+            if (size == 7) {
+                itemHolder.yearMonthTextView.setTextColor(getResources().getColor(Utils.getTeamColor(position)));
+            }
+
             itemHolder.itemView.setOnClickListener(v -> {
                 if (selectedPosition == position) { return; }
                 selectedPosition = position;
 
-                if (size == 11) {
+                if (size == 7) {
+                    team = Utils.getTeamCode(position);
+                } else if (size == 11) {
                     month = 2 + position;
                 } else {
                     year = 1990 + position;
                 }
                 adapter.notifyDataSetChanged();
-                if (year != 0 && month != 0 ) {sendDataBack(year, month);}
+                if (year != 0 && month != 0 ) {sendDataBack(year, month, team);}
             });
 
 

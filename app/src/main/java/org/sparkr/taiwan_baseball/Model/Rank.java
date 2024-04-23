@@ -1,47 +1,40 @@
 package org.sparkr.taiwan_baseball.Model;
 
+import java.io.Serializable;
+
 /**
  * Created by Keith on 2018/1/31.
  */
 
-public class Rank {
+public class Rank implements Serializable {
     private String team;
-    private String win;
-    private String lose;
-    private String tie;
-    private String percentage;
-    private String gamebehind;
-
-    public Rank(String team, String win, String tie, String lose, String percentage, String gamebehind) {
-        this.team = team;
-        this.win = win;
-        this.lose = lose;
-        this.tie = tie;
-        this.percentage = percentage;
-        this.gamebehind = gamebehind;
-    }
+    private int rank;
+    private int display_rank;
+    private int win;
+    private int lose;
+    private int tie;
+    private double winning_rate;
+    private double game_behind;
 
     public String getTeam() {
         return this.team;
     }
 
-    public String getWin() {
-        return this.win;
-    }
+    public int getRank() { return this.rank; }
 
-    public String getLose() {
+    public int getDisplay_rank() { return this.display_rank; }
+
+    public int getWin() { return this.win; }
+
+    public int getLose() {
         return this.lose;
     }
 
-    public String getTie() {
+    public int getTie() {
         return this.tie;
     }
 
-    public String getPercentage() {
-        return this.percentage;
-    }
+    public double getWinning_rate() { return this.winning_rate; }
 
-    public String getGamebehind() {
-        return this.gamebehind;
-    }
+    public double getGame_behind() { return this.game_behind; }
 }

@@ -168,4 +168,29 @@ public class Utils {
                 return "";
         }
     }
+
+    public static String getTeamCode(int team) {
+        switch (team) {
+            case 0: return "all";
+            case 1: return "-1";
+            case 2: return "1";
+            case 3: return "2";
+            case 4: return "3-0";
+            case 5: return "4";
+            case 6: return "6";
+            default: return "";
+        }
+    }
+
+    public static int getTeamColor(int index) {
+        switch (index) {
+            case 1: return R.color.dragonRed;
+            case 2: return R.color.elephantYellow;
+            case 3: return R.color.lionOrange;
+            case 4: return R.color.monkeyRed;
+            case 5: return R.color.guardianBlue;
+            case 6: return R.color.hawkGreen;
+            default: return R.color.lighterCPBLBlue;
+        }
+    }
 }
